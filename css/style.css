@@ -20,6 +20,10 @@ table#board tbody tr td {
   height: 100px;
   width: 100px;
   background-color: #F3BF91;
+  text-align: center;
+  font-size: 50px;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-weight: bolder;
 }
 
 table#board tbody tr:nth-child(odd) td:nth-child(even) {
