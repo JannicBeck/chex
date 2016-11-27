@@ -1,0 +1,17 @@
+table#board {
+  border-spacing: 0;
+}
+
+table#board tr td {
+  height: 100px;
+  width: 100px;
+  background-color: #F2B885;
+}
+
+table#board tr:nth-child(odd) td:nth-child(even) {
+  background-color: #4B1F08;
+}
+
+table#board tr:nth-child(even) td:nth-child(odd) {
+  background-color: #4B1F08;
+}
