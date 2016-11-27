@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "https://github.com/JannicBeck/chex",
   "author": "jannicbeck <jannicbeck@gmail.com>",
-  "license": "GPL"
+  "license": "GPL",
+  "dependencies": {
+    "redux": "^3.6.0"
+  }
 }
