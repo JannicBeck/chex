@@ -1,2 +1,2 @@
-# chex
+# CheX
 Chess with Redux
