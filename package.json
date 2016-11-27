@@ -1,0 +1,9 @@
+{
+  "name": "CheX",
+  "version": "0.1.0",
+  "description": "Chess with Redux",
+  "main": "index.js",
+  "repository": "https://github.com/JannicBeck/chex",
+  "author": "jannicbeck <jannicbeck@gmail.com>",
+  "license": "GPL"
+}
