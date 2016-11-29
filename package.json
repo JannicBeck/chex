@@ -6,6 +6,7 @@
   "scripts": {
     "rollup": "rollup -c rollup.js",
     "build": "yarn run rollup && gzip index.js",
+    "dev": "rollup -c rollup.js -ws",
     "start": "http-server -o -g"
   },
   "repository": "https://github.com/JannicBeck/chex",
@@ -21,6 +22,7 @@
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-typescript": "^0.8.1",
     "rollup-plugin-uglify": "^1.0.1",
+    "rollup-watch": "^2.5.0",
     "typescript": "^2.0.10"
   }
 }
