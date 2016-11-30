@@ -4,25 +4,16 @@
   "description": "Chess with Redux",
   "main": "index.js",
   "scripts": {
-    "rollup": "rollup -c rollup.js",
-    "build": "yarn run rollup && gzip index.js",
-    "dev": "rollup -c rollup.js -ws",
-    "start": "http-server -o -g"
+    "build": "tsc index.ts -w",
+    "start": "live-server"
   },
   "repository": "https://github.com/JannicBeck/chex",
   "author": "jannicbeck <jannicbeck@gmail.com>",
   "license": "GPL-3.0",
   "dependencies": {
     "gzip": "^0.1.0",
-    "http-server": "^0.9.0",
+    "live-server": "^1.1.0",
     "redux": "^3.6.0",
-    "rollup": "^0.36.4",
-    "rollup-plugin-commonjs": "^5.0.5",
-    "rollup-plugin-node-resolve": "^2.0.0",
-    "rollup-plugin-replace": "^1.1.1",
-    "rollup-plugin-typescript": "^0.8.1",
-    "rollup-plugin-uglify": "^1.0.1",
-    "rollup-watch": "^2.5.0",
     "typescript": "^2.0.10"
   }
 }
