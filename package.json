@@ -4,16 +4,13 @@
   "description": "Chess with Redux",
   "main": "index.js",
   "scripts": {
-    "build": "tsc index.ts -w",
-    "start": "live-server"
+    "start": "node app.js"
   },
   "repository": "https://github.com/JannicBeck/chex",
   "author": "jannicbeck <jannicbeck@gmail.com>",
   "license": "GPL-3.0",
   "dependencies": {
     "gzip": "^0.1.0",
-    "live-server": "^1.1.0",
-    "redux": "^3.6.0",
-    "typescript": "^2.0.10"
+    "redux": "^3.6.0"
   }
 }
