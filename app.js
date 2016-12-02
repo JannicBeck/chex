@@ -1,14 +1,14 @@
 const Rx = require('redux');
 
 const Pos = {
-  A8: 0, B8: 1, C8: 2, D8: 3, E8: 4, F8: 5, G8: 6, H8: 7,
-  A7: 8, B7: 9, C7: 10, D7: 11, E7: 12, F7: 13, G7: 14, H7: 15,
-  A6: 16, B6: 17, C6: 18, D6: 19, E6: 20, F6: 21, G6: 22, H6: 23,
-  A5: 24, B5: 25, C5: 26, D5: 27, E5: 28, F5: 29, G5: 30, H5: 31,
-  A4: 32, B4: 33, C4: 34, D4: 35, E4: 36, F4: 37, G4: 38, H4: 39,
-  A3: 40, B3: 41, C3: 42, D3: 43, E3: 44, F3: 45, G3: 46, H3: 47,
-  A2: 48, B2: 49, C2: 50, D2: 51, E2: 52, F2: 53, G2: 54, H2: 55,
-  A1: 56, B1: 57, C1: 58, D1: 59, E1: 60, F1: 61, G1: 62, H1: 63
+  A1: 0, B1: 1, C1: 2, D1: 3, E1: 4, F1: 5, G1: 6, H1: 7,
+  A2: 8, B2: 9, C2: 10, D2: 11, E2: 12, F2: 13, G2: 14, H2: 15,
+  A3: 16, B3: 17, C3: 18, D3: 19, E3: 20, F3: 21, G3: 22, H3: 23,
+  A4: 24, B4: 25, C4: 26, D4: 27, E4: 28, F4: 29, G4: 30, H4: 31,
+  A5: 32, B5: 33, C5: 34, D5: 35, E5: 36, F5: 37, G5: 38, H5: 39,
+  A6: 40, B6: 41, C6: 42, D6: 43, E6: 44, F6: 45, G6: 46, H6: 47,
+  A7: 48, B7: 49, C7: 50, D7: 51, E7: 52, F7: 53, G7: 54, H7: 55,
+  A8: 56, B8: 57, C8: 58, D8: 59, E8: 60, F8: 61, G8: 62, H8: 63
 }
 
 const FigureType = {
@@ -60,59 +60,17 @@ board[Pos.H8] = {
   player: Player.Black
 };
 
-board[Pos.A7] = pawn(Player.Black);
-board[Pos.B7] = pawn(Player.Black);
-board[Pos.C7] = pawn(Player.Black);
-board[Pos.D7] = pawn(Player.Black);
-board[Pos.E7] = pawn(Player.Black);
-board[Pos.F7] = pawn(Player.Black);
-board[Pos.G7] = pawn(Player.Black);
-board[Pos.H7] = pawn(Player.Black);
+for (let i = Pos.A7; i <= Pos.H7; i++) {
+  board[i] = pawn(Player.Black);
+}
 
-board[Pos.A6] = null;
-board[Pos.B6] = null;
-board[Pos.C6] = null;
-board[Pos.D6] = null;
-board[Pos.E6] = null;
-board[Pos.F6] = null;
-board[Pos.G6] = null;
-board[Pos.H6] = null;
+for (let i = Pos.A2; i <= Pos.H2; i++) {
+  board[i] = pawn(Player.White);
+}
 
-board[Pos.A5] = null;
-board[Pos.B5] = null;
-board[Pos.C5] = null;
-board[Pos.D5] = null;
-board[Pos.E5] = null;
-board[Pos.F5] = null;
-board[Pos.G5] = null;
-board[Pos.H5] = null;
-
-board[Pos.A4] = null;
-board[Pos.B4] = null;
-board[Pos.C4] = null;
-board[Pos.D4] = null;
-board[Pos.E4] = null;
-board[Pos.F4] = null;
-board[Pos.G4] = null;
-board[Pos.H4] = null;
-
-board[Pos.A3] = null;
-board[Pos.B3] = null;
-board[Pos.C3] = null;
-board[Pos.D3] = null;
-board[Pos.E3] = null;
-board[Pos.F3] = null;
-board[Pos.G3] = null;
-board[Pos.H3] = null;
-
-board[Pos.A2] = pawn(Player.White);
-board[Pos.B2] = pawn(Player.White);
-board[Pos.C2] = pawn(Player.White);
-board[Pos.D2] = pawn(Player.White);
-board[Pos.E2] = pawn(Player.White);
-board[Pos.F2] = pawn(Player.White);
-board[Pos.G2] = pawn(Player.White);
-board[Pos.H2] = pawn(Player.White);
+for (let i = Pos.A3; i <= Pos.H6; i++) {
+  board[i] = null;
+}
 
 board[Pos.A1] = {
   type: FigureType.Rook,
@@ -159,13 +117,25 @@ const MOVE = 'MOVE';
 const reducer = (state = board, { type, payload }) => {
   switch (type) {
     case MOVE:
-      return [
-        ...state.slice(0, payload.from),
-        null,
-        ...state.slice(payload.from, payload.to),
-        state[payload.from], 
-        ...state.slice(payload.to + 1)
-      ];
+      if (payload.from < payload.to) {
+        return [
+          ...state.slice(0, payload.from),
+          null,
+          ...state.slice(payload.from + 1, payload.to),
+          state[payload.from], 
+          ...state.slice(payload.to + 1)
+        ];
+      } else if (payload.from > payload.to) {
+        return [
+          ...state.slice(0, payload.to),
+          state[payload.from],
+          ...state.slice(payload.to + 1, payload.from),
+          null,
+          ...state.slice(payload.from + 1)
+        ];
+      } else {
+        return state;
+      }
     default:
       return state;
   }
@@ -186,3 +156,10 @@ store.dispatch({
   }
 });
 
+store.dispatch({
+  type: MOVE,
+  payload: {
+    from: Pos.D2,
+    to: Pos.D4
+  }
+});
