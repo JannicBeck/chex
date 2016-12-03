@@ -1,154 +1,11 @@
 const Rx = require('redux');
-const chalk = require('chalk');
 
+const logger = require('./logger.js');
 
-const logBoard = (board) => {
-  let coloredBoard = board
-    .map(colorText)
-    .map(colorBg);
-  for (let i = 8; i <= coloredBoard.length; i += 8) {
-    let row = coloredBoard.slice(i - 8, i);
-    console.log(chalk.black(row));
-  }
-  console.log('\n');
-};
-
-const colorText = (square) => {
-  if (square) {
-    let figure = square.player.charAt(0) + square.type.charAt(0);
-    if (square.player === Player.White) {
-      return chalk.white(figure);
-    } else {
-      return chalk.grey(figure);
-    }
-  } else {
-    return '\u0020\u0020';
-  }
-};
-
-const colorBg = (square, index) => {
-  let rowIndex = Math.floor(index / 8);
-  let squareEven = index % 2 === 0;
-  let rowEven = rowIndex % 2 !== 0;
-  if ((!squareEven && rowEven) || (squareEven && !rowEven)) {
-    return chalk.bgWhite(square);
-  } else {
-    return chalk.bgBlack(square);
-  }
-};
-
-
-const Pos = {
-  A1: 0, B1: 1, C1: 2, D1: 3, E1: 4, F1: 5, G1: 6, H1: 7,
-  A2: 8, B2: 9, C2: 10, D2: 11, E2: 12, F2: 13, G2: 14, H2: 15,
-  A3: 16, B3: 17, C3: 18, D3: 19, E3: 20, F3: 21, G3: 22, H3: 23,
-  A4: 24, B4: 25, C4: 26, D4: 27, E4: 28, F4: 29, G4: 30, H4: 31,
-  A5: 32, B5: 33, C5: 34, D5: 35, E5: 36, F5: 37, G5: 38, H5: 39,
-  A6: 40, B6: 41, C6: 42, D6: 43, E6: 44, F6: 45, G6: 46, H6: 47,
-  A7: 48, B7: 49, C7: 50, D7: 51, E7: 52, F7: 53, G7: 54, H7: 55,
-  A8: 56, B8: 57, C8: 58, D8: 59, E8: 60, F8: 61, G8: 62, H8: 63
-}
-
-const FigureType = {
-  King: 'King',
-  Queen: 'Queen',
-  Bishop: 'Bishop',
-  Knight: 'Knight',
-  Rook: 'Rook',
-  Pawn: 'Pawn'
-};
-
-const Player = {
-  White: 'White',
-  Black: 'Black'
-};
-
-let board = [];
-
-board[Pos.A8] = {
-  type: FigureType.Rook,
-  player: Player.Black
-};
-board[Pos.B8] = {
-  type: FigureType.Knight,
-  player: Player.Black
-};
-board[Pos.C8] = {
-  type: FigureType.Bishop,
-  player: Player.Black
-};
-board[Pos.D8] = {
-  type: FigureType.King,
-  player: Player.Black
-};
-board[Pos.E8] = {
-  type: FigureType.Queen,
-  player: Player.Black
-};
-board[Pos.F8] = {
-  type: FigureType.Bishop,
-  player: Player.Black
-};
-board[Pos.G8] = {
-  type: FigureType.Knight,
-  player: Player.Black
-};
-board[Pos.H8] = {
-  type: FigureType.Rook,
-  player: Player.Black
-};
-
-for (let i = Pos.A7; i <= Pos.H7; i++) {
-  board[i] = pawn(Player.Black);
-}
-
-for (let i = Pos.A2; i <= Pos.H2; i++) {
-  board[i] = pawn(Player.White);
-}
-
-for (let i = Pos.A3; i <= Pos.H6; i++) {
-  board[i] = null;
-}
-
-board[Pos.A1] = {
-  type: FigureType.Rook,
-  player: Player.White
-};
-board[Pos.B1] = {
-  type: FigureType.Knight,
-  player: Player.White
-};
-board[Pos.C1] = {
-  type: FigureType.Bishop,
-  player: Player.White
-};
-board[Pos.D1] = {
-  type: FigureType.King,
-  player: Player.White
-};
-board[Pos.E1] = {
-  type: FigureType.Queen,
-  player: Player.White
-};
-board[Pos.F1] = {
-  type: FigureType.Bishop,
-  player: Player.White
-};
-board[Pos.G1] = {
-  type: FigureType.Knight,
-  player: Player.White
-};
-board[Pos.H1] = {
-  type: FigureType.Rook,
-  player: Player.White
-};
-
-function pawn(player) {
-  return {
-    type: FigureType.Pawn,
-    player,
-  };
-}
+const Player = require('./player.js');
+const Pos = require('./position.js');
+const Figure = require('./figure.js');
+const board = require('./board.js');
 
 const MOVE = 'MOVE';
 
@@ -182,7 +39,7 @@ const reducer = (state = board, { type, payload }) => {
 let store = Rx.createStore(reducer);
 
 store.subscribe(() => {
-  logBoard(store.getState());
+  logger(store.getState());
 });
 
 store.dispatch({
