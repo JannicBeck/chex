@@ -12,5 +12,8 @@
   "dependencies": {
     "gzip": "^0.1.0",
     "redux": "^3.6.0"
+  },
+  "devDependencies": {
+    "chalk": "^1.1.3"
   }
 }

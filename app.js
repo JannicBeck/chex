@@ -1,4 +1,37 @@
 const Rx = require('redux');
+const chalk = require('chalk');
+
+const logBoard = (board) => {
+
+  let b = board.map((square, index) => {
+    square = square ? square.player.charAt(0) + square.type.charAt(0) : '  ';
+    let rowIndex = Math.floor(index / 8);
+    let squareEven = index % 2 === 0;
+    let rowEven = rowIndex % 2 !== 0;
+    let isWhite = square.charAt(0) === 'W';
+
+    if ((!squareEven && rowEven) || (squareEven && !rowEven)) {
+      square = chalk.bgWhite(square);
+    } else {
+      square = chalk.bgBlack(square);
+    }
+    if (square) {
+      if (isWhite) {
+        square = chalk.white(square);
+      } else {
+        square = chalk.grey(square);
+      }
+    }
+    return square;
+  });
+
+  for (let i = 8; i <= b.length; i += 8) {
+    let row = b.slice(i - 8, i);
+    console.log(chalk.black(row));
+  }
+
+  console.log('\n');
+};
 
 const Pos = {
   A1: 0, B1: 1, C1: 2, D1: 3, E1: 4, F1: 5, G1: 6, H1: 7,
@@ -18,12 +51,12 @@ const FigureType = {
   Knight: 'Knight',
   Rook: 'Rook',
   Pawn: 'Pawn'
-}
+};
 
 const Player = {
   White: 'White',
   Black: 'Black'
-}
+};
 
 let board = [];
 
@@ -143,9 +176,8 @@ const reducer = (state = board, { type, payload }) => {
 
 let store = Rx.createStore(reducer);
 
-console.log(store.getState());
 store.subscribe(() => {
-  console.log(store.getState());
+  logBoard(store.getState());
 });
 
 store.dispatch({
@@ -163,3 +195,5 @@ store.dispatch({
     to: Pos.D4
   }
 });
+
+
