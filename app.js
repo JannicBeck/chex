@@ -38,11 +38,23 @@ const reducer = (state = board, { type, payload }) => {
 
 let store = Rx.createStore(reducer);
 
+logger(store.getState());
+
 store.subscribe(() => {
   logger(store.getState());
 });
 
-store.dispatch({
+let timeout = 1000;
+
+function fire (action) {
+  timeout += 1000;
+  setTimeout(function () {
+    store.dispatch(action);
+  }, timeout)
+};
+
+
+fire({
   type: MOVE,
   payload: {
     from: Pos.D7,
@@ -50,12 +62,11 @@ store.dispatch({
   }
 });
 
-store.dispatch({
+fire({
   type: MOVE,
   payload: {
     from: Pos.D2,
     to: Pos.D4
   }
 });
-
 
