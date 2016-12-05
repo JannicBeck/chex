@@ -2,11 +2,12 @@ const Player = require('./player.js');
 const chalk = require('chalk');
 
 module.exports = (board) => {
+  const sideLength = Math.sqrt(board.length);
   let coloredBoard = board
     .map(colorText)
     .map(colorBg);
-  for (let i = 8; i <= coloredBoard.length; i += 8) {
-    let row = coloredBoard.slice(i - 8, i);
+  for (let i = 0; i <= coloredBoard.length; i += sideLength) {
+    let row = coloredBoard.slice(i, i + sideLength);
     console.log(chalk.black(row));
   }
   console.log('\n');
@@ -14,15 +15,19 @@ module.exports = (board) => {
 
 const colorText = (square) => {
   if (square) {
-    let isWhite = square.player === Player.White;
-    let figure = (isWhite ? 'W' : 'B') + square.type.charAt(0);
-    if (isWhite) {
-      return chalk.white(figure);
+    if (square !== 'EMPTY') {
+      let isWhite = square.player === Player.White;
+      let figure = (isWhite ? 'W' : 'B') + square.type.charAt(0);
+      if (isWhite) {
+        return chalk.white(figure);
+      } else {
+        return chalk.grey(figure);
+      }
     } else {
-      return chalk.grey(figure);
+      return '\u0020\u0020';
     }
   } else {
-    return '\u0020\u0020';
+    return chalk.red('XX');
   }
 };
 

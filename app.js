@@ -54,19 +54,19 @@ function fire (action) {
 };
 
 
-fire({
-  type: MOVE,
-  payload: {
-    from: Pos.D7,
-    to: Pos.D6
-  }
-});
+// fire({
+//   type: MOVE,
+//   payload: {
+//     from: Pos.D7,
+//     to: Pos.D6
+//   }
+// });
 
-fire({
-  type: MOVE,
-  payload: {
-    from: Pos.D2,
-    to: Pos.D4
-  }
-});
+// fire({
+//   type: MOVE,
+//   payload: {
+//     from: Pos.D2,
+//     to: Pos.D4
+//   }
+// });
 

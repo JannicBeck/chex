@@ -2,6 +2,8 @@ const Player = require('./player.js');
 const Pos = require('./position.js');
 const Figure = require('./figure.js');
 
+const EMPTY = 'EMPTY';
+
 let board = [];
 
 board[Pos.A8] = {
@@ -46,7 +48,7 @@ for (let i = Pos.A2; i <= Pos.H2; i++) {
 }
 
 for (let i = Pos.A3; i <= Pos.H6; i++) {
-  board[i] = null;
+  board[i] = EMPTY;
 }
 
 board[Pos.A1] = {
@@ -89,4 +91,28 @@ function pawn(player) {
   };
 }
 
-module.exports = board;
+// 12x12 board for the Knight
+let virtualBoard = [];
+const SIDELENGTH = 12;
+
+// add two rows on top
+for (let i = 0; i < 2 * SIDELENGTH; i++) {
+  virtualBoard.push(null);
+}
+
+// add two columns left and two columns right
+for (let i = 0; i < board.length; i += Math.sqrt(board.length)) {
+  let row = board.slice(i, i + Math.sqrt(board.length));
+  row.push(null);
+  row.push(null);
+  row.unshift(null);
+  row.unshift(null);
+  virtualBoard = virtualBoard.concat(row);
+}
+
+// prepend two rows on bottom
+for (let i = 0; i < 2 * SIDELENGTH; i++) {
+  virtualBoard.push(null);
+}
+
+module.exports = virtualBoard;
