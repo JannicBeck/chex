@@ -69,7 +69,9 @@ function fire (action) {
 //   type: MOVE,
 //   payload: {
 //     from: Pos.D2,
-//     to: Pos.D4
+//     to: Pos.D6
 //   }
 // });
 
+const validateMove = require('./validator.js')
+console.log(validateMove(64))

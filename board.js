@@ -91,7 +91,7 @@ function pawn(player) {
   };
 }
 
-// 12x12 board for the Knight
+// 12x12 board that solves the Knight problem
 let virtualBoard = [];
 const SIDELENGTH = 12;
 
@@ -116,6 +116,6 @@ for (let i = 0; i < 2 * SIDELENGTH; i++) {
 }
 
 module.exports = {
-  board, 
+  board,
   virtualBoard
 };
