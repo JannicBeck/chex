@@ -115,4 +115,7 @@ for (let i = 0; i < 2 * SIDELENGTH; i++) {
   virtualBoard.push(null);
 }
 
-module.exports = virtualBoard;
+module.exports = {
+  board, 
+  virtualBoard
+};

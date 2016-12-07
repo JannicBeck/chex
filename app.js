@@ -5,7 +5,10 @@ const logger = require('./logger.js');
 const Player = require('./player.js');
 const Pos = require('./position.js');
 const Figure = require('./figure.js');
-const board = require('./board.js');
+const board = require('./board.js').board;
+const virtualBoard = require('./board.js').virtualBoard;
+
+const EMPTY = 'EMPTY';
 
 const MOVE = 'MOVE';
 
@@ -15,7 +18,7 @@ const reducer = (state = board, { type, payload }) => {
       if (payload.from < payload.to) {
         return [
           ...state.slice(0, payload.from),
-          null,
+          EMPTY,
           ...state.slice(payload.from + 1, payload.to),
           state[payload.from], 
           ...state.slice(payload.to + 1)
@@ -25,7 +28,7 @@ const reducer = (state = board, { type, payload }) => {
           ...state.slice(0, payload.to),
           state[payload.from],
           ...state.slice(payload.to + 1, payload.from),
-          null,
+          EMPTY,
           ...state.slice(payload.from + 1)
         ];
       } else {

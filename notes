@@ -1,0 +1,46 @@
+Board Representation: 
+  - Piece Centric:
+    (Keeps lists, arrays or sets of all pieces still on the board - with
+     the associated informaion which square they occupy)
+      - Piece-Lists
+      - Piece-Sets
+      - Bitboards
+  - Square Centric
+    (Is a square empty or is it occupied by a particular piece?
+     Arrays of direct piece-codes including the empty square and
+     out of board codes)
+      - Mailbox
+      - 8x8 Board
+      - 10x12 Board
+      - 0x88
+      - Vector Attacks
+  - Hybrid
+    (Different Algorithms or Tasks prefer one or the other. Therefore
+     redundant board representations with elements of both are used)
+
+
+the problem with the Knight:
+
+	1. I don't want the board to be bigger than it is in reality.
+	   Although this is a very elegant solution to the problem.
+	
+	2. There is a second option, which is to write some methods that
+	   restrict the movement of the Knight.
+	   But they seem to be too complex and verbose.
+
+	An elegant solution might be to use a virtual board, which is
+	bigger than the actual board. (see 10x12 Board representation)
+	The virtual board would then be sliced to the real board.
+	Therefore I'll have a nice clean board, representing reality
+	and a virtual board which elegantly solves the Knight problem.
+
+on organizing the Reducers:
+
+	I'm not happy with the way reducers are organized
+	I especially don't like that case: SomeAction has
+	to be repeated in the child reducers although
+	we already know the case in the main reducer.
+	
+	An idea to organize reducers would be an object, with
+	action keys and reducer values. 
+	E.g. MoveAction: moveReducer
