@@ -12,6 +12,14 @@ const EMPTY = 'EMPTY';
 
 const MOVE = 'MOVE';
 
+const actionReducerMapping = {
+  MOVE: reducer
+};
+
+const move = (state = board, action) => {
+  actionReducerMapping[type](state, action);
+}
+
 const reducer = (state = board, { type, payload }) => {
   switch (type) {
     case MOVE:
@@ -74,4 +82,8 @@ function fire (action) {
 // });
 
 const validateMove = require('./validator.js')
-console.log(validateMove(64))
+console.log(validateMove({
+  from: Pos.D2,
+  to: Pos.D4,
+  type: Figure.Rook
+}));

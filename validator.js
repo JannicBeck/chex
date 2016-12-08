@@ -1,21 +1,40 @@
 const virtualBoard = require('./board.js').virtualBoard;
 const board = require('./board.js').board;
+const Figure = require('./figure.js');
 
-function calculatePositionOnVirtualBoard (position) {
-    const VIRTUALBOARDSIDELENGTH = Math.sqrt(virtualBoard.length);
-    const BOARDSIDELENGTH = Math.sqrt(board.length);
-    // two rows on top and two columns on the left side
-    const FIRSTVALIDSQUARE = VIRTUALBOARDSIDELENGTH * 2 + 2;
-    const rowNumber = (Math.floor(position / BOARDSIDELENGTH));
-    // 2 columns left, 2 columns right -> 4 columns total
-    return (FIRSTVALIDSQUARE + position) + (rowNumber * 4);
+const VIRTUALBOARDSIDELENGTH = Math.sqrt(virtualBoard.length);
+const BOARDSIDELENGTH = Math.sqrt(board.length);
+  const FIRSTVALIDSQUARE = VIRTUALBOARDSIDELENGTH * 2 + 2;
+
+function calculatePositionOnVirtualBoard(position) {
+  const rowNumber = (Math.floor(position / BOARDSIDELENGTH));
+  return (FIRSTVALIDSQUARE + position) + (rowNumber * 4);
 }
 
-module.exports = function validateMove (position) {
-    const positionOnVirtualBoard = calculatePositionOnVirtualBoard(position);
-    if (virtualBoard[positionOnVirtualBoard]) {
-        return true;
-    } else {
-        return false;
-    }
+// this should be calculatePositionOnVirtualBoard^-1
+function calculatePositionOnBoard(position) {
+  const rowNumber = (Math.floor((position - FIRSTVALIDSQUARE) / BOARDSIDELENGTH));
+  return (position - (FIRSTVALIDSQUARE + rowNumber * 4));
+}
+
+module.exports = function validateMove(position, figure) {
+  return figureMap[figure](position);
+}
+
+function getValidPawnMoves (position) {
+  return position + BOARDSIDELENGTH;
+}
+
+function getValidKnightMoves (position) {
+  const from = calculatePositionOnVirtualBoard(position.from);
+  const to = calculatePositionOnVirtualBoard(position.to);
+}
+
+const figureMapping = {
+  [Figure.Pawn]: getValidPawnMoves,
+  [Figure.Bishop]: getValidBishopMoves,
+  [Figure.Knight]: getValidKnightMoves,
+  [Figure.King]: getValidKingMoves,
+  [Figure.Queen]: getValidQueenMoves,
+  [Figure.Rook]: getValidRookMoves
 }
