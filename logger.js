@@ -24,34 +24,33 @@ const FIGURE_SYMBOLS = {
 };
 
 module.exports = (board) => {
-
-  const sideLength = Math.sqrt(board.length);
   let output = '';
-  let formattedBoard = board.map(formatBoard);
-  for (let i = 0; i < formattedBoard.length; i++) {
-    output += formattedBoard[i];
-    if ((i + 1) % 8 === 0) output += '\n';
+  const sideLength = Math.sqrt(board.length);
+
+  for (let i = 0; i < board.length; i++) {
+    let square = board[i];
+    if (square) {
+      if (square !== EMPTY) {
+        square = FIGURE_SYMBOLS[square.player][square.type] + ' ';
+      } else {
+        square = '\u0020\u0020';
+      }
+
+      let rowIndex = Math.floor(i / sideLength);
+      let squareEven = i % 2 === 0;
+      let rowEven = rowIndex % 2 !== 0;
+      if ((!squareEven && rowEven) || (squareEven && !rowEven)) {
+        square = chalk.bgWhite(square);
+      } else {
+        square = chalk.bgBlack(square);
+      }
+    } else {
+      square = chalk.bgCyan.white('XX');
+    }
+
+    output += square;
+    if ((i + 1) % sideLength === 0) output += '\n';
   }
   console.log(output)
 
-  function formatBoard(square, index) {
-    let figure;
-    if (square) {
-      if (square !== EMPTY) {
-        figure = FIGURE_SYMBOLS[square.player][square.type] + ' ';
-      } else {
-        figure = '\u0020\u0020';
-      }
-      let rowIndex = Math.floor(index / sideLength);
-      let squareEven = index % 2 === 0;
-      let rowEven = rowIndex % 2 !== 0;
-      if ((!squareEven && rowEven) || (squareEven && !rowEven)) {
-        return chalk.bgWhite(figure);
-      } else {
-        return chalk.bgBlack(figure);
-      }
-    } else {
-      return chalk.bgCyan.white('XX');
-    }
-  }
 };
