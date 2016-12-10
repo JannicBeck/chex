@@ -12,9 +12,9 @@ const EMPTY = 'EMPTY';
 
 const MOVE = 'MOVE';
 
-const actionReducerMapping = {
-  MOVE: reducer
-};
+// const actionReducerMapping = {
+//   MOVE: reducer
+// };
 
 const move = (state = board, action) => {
   actionReducerMapping[type](state, action);
@@ -52,7 +52,7 @@ let store = Rx.createStore(reducer);
 logger(store.getState());
 
 store.subscribe(() => {
-  logger(store.getState());
+  // logger(store.getState());
 });
 
 let timeout = 1000;
@@ -81,9 +81,9 @@ function fire (action) {
 //   }
 // });
 
-const validateMove = require('./validator.js')
-console.log(validateMove({
-  from: Pos.D2,
-  to: Pos.D4,
-  type: Figure.Rook
-}));
+// const validateMove = require('./validator.js')
+// console.log(validateMove({
+//   from: Pos.D2,
+//   to: Pos.D4,
+//   type: Figure.Rook
+// }));
