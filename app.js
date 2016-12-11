@@ -60,13 +60,14 @@ store.subscribe(() => {
 let timeout = 1000;
 
 function move (input) {
-  let inputList = input.replace('\n', '').split('-');
-  console.log(inputList);
+  let inputList = input.toUpperCase().replace('\n', '').split('-');
+  let from = inputList[0];
+  let to = inputList[1];
   store.dispatch({
     type: MOVE,
     payload: {
-      from: inputList[0],
-      to: inputList[1]
+      from: Pos[from],
+      to: Pos[to]
     }
   });
 }
