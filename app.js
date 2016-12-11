@@ -7,6 +7,8 @@ const Pos = require('./position.js');
 const Figure = require('./figure.js');
 const board = require('./board.js').board;
 const virtualBoard = require('./board.js').virtualBoard;
+const chalk = require('chalk');
+const repl = require('repl');
 
 const EMPTY = 'EMPTY';
 
@@ -16,9 +18,9 @@ const MOVE = 'MOVE';
 //   MOVE: reducer
 // };
 
-const move = (state = board, action) => {
-  actionReducerMapping[type](state, action);
-}
+// const move = (state = board, action) => {
+//   actionReducerMapping[type](state, action);
+// }
 
 const reducer = (state = board, { type, payload }) => {
   switch (type) {
@@ -52,34 +54,25 @@ let store = Rx.createStore(reducer);
 logger(store.getState());
 
 store.subscribe(() => {
-  // logger(store.getState());
+  logger(store.getState());
 });
 
 let timeout = 1000;
 
-function fire (action) {
-  timeout += 1000;
-  setTimeout(function () {
-    store.dispatch(action);
-  }, timeout)
-};
+function move (input) {
+  let inputList = input.replace('\n', '').split('-');
+  console.log(inputList);
+  store.dispatch({
+    type: MOVE,
+    payload: {
+      from: inputList[0],
+      to: inputList[1]
+    }
+  });
+}
 
+repl.start({prompt: '> ', eval: move});
 
-// fire({
-//   type: MOVE,
-//   payload: {
-//     from: Pos.D7,
-//     to: Pos.D6
-//   }
-// });
-
-// fire({
-//   type: MOVE,
-//   payload: {
-//     from: Pos.D2,
-//     to: Pos.D6
-//   }
-// });
 
 // const validateMove = require('./validator.js')
 // console.log(validateMove({

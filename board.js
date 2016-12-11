@@ -40,11 +40,11 @@ board[Pos.H8] = {
 };
 
 for (let i = Pos.A7; i <= Pos.H7; i++) {
-  board[i] = pawn(Player.Black);
+  board[i] = generatePawn(Player.Black);
 }
 
 for (let i = Pos.A2; i <= Pos.H2; i++) {
-  board[i] = pawn(Player.White);
+  board[i] = generatePawn(Player.White);
 }
 
 for (let i = Pos.A3; i <= Pos.H6; i++) {
@@ -84,7 +84,7 @@ board[Pos.H1] = {
   player: Player.White
 };
 
-function pawn(player) {
+function generatePawn(player) {
   return {
     type: Figure.Pawn,
     player,

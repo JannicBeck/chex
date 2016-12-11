@@ -44,3 +44,7 @@ on organizing the Reducers:
 	An idea to organize reducers would be an object, with
 	action keys and reducer values. 
 	E.g. MoveAction: moveReducer
+
+
+Misc:
+  Use debug log statements instead of comment

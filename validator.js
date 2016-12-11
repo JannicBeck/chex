@@ -17,24 +17,24 @@ function calculatePositionOnBoard(position) {
   return (position - (FIRSTVALIDSQUARE + rowNumber * 4));
 }
 
-module.exports = function validateMove(position, figure) {
+module.exports = function isValidMove(position, figure) {
   return figureMap[figure](position);
 }
 
-function getValidPawnMoves (position) {
+function possbilePawnMoves (position) {
   return position + BOARDSIDELENGTH;
 }
 
-function getValidKnightMoves (position) {
+function possbileKnightMoves (position) {
   const from = calculatePositionOnVirtualBoard(position.from);
   const to = calculatePositionOnVirtualBoard(position.to);
 }
 
 const figureMapping = {
-  [Figure.Pawn]: getValidPawnMoves,
-  [Figure.Bishop]: getValidBishopMoves,
-  [Figure.Knight]: getValidKnightMoves,
-  [Figure.King]: getValidKingMoves,
-  [Figure.Queen]: getValidQueenMoves,
-  [Figure.Rook]: getValidRookMoves
+  [Figure.Pawn]: possbilePawnMoves,
+  [Figure.Bishop]: possbileBishopMoves,
+  [Figure.Knight]: possbileKnightMoves,
+  [Figure.King]: possbileKingMoves,
+  [Figure.Queen]: possbileQueenMoves,
+  [Figure.Rook]: possbileRookMoves
 }
