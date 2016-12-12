@@ -52,5 +52,4 @@ module.exports = (board) => {
     if ((i + 1) % sideLength === 0) output += '\n';
   }
   console.log(output)
-
 };
