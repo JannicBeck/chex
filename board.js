@@ -92,30 +92,33 @@ function generatePawn(player) {
 }
 
 // 12x12 board that solves the Knight problem
-let virtualBoard = [];
-const SIDELENGTH = 12;
+function createVirtualBoard () {
+  let virtualBoard = [];
+  const SIDELENGTH = 12;
 
-// add two rows on top
-for (let i = 0; i < 2 * SIDELENGTH; i++) {
-  virtualBoard.push(null);
-}
+  // add two rows on top
+  for (let i = 0; i < 2 * SIDELENGTH; i++) {
+    virtualBoard.push(null);
+  }
 
-// add two columns left and two columns right
-for (let i = 0; i < initialBoard.length; i += Math.sqrt(initialBoard.length)) {
-  let row = initialBoard.slice(i, i + Math.sqrt(initialBoard.length));
-  row.push(null);
-  row.push(null);
-  row.unshift(null);
-  row.unshift(null);
-  virtualBoard = virtualBoard.concat(row);
-}
+  // add two columns left and two columns right
+  for (let i = 0; i < initialBoard.length; i += Math.sqrt(initialBoard.length)) {
+    let row = initialBoard.slice(i, i + Math.sqrt(initialBoard.length));
+    row.unshift(null);
+    row.unshift(null);
+    row.push(null);
+    row.push(null);
+    virtualBoard = virtualBoard.concat(row);
+  }
 
-// prepend two rows on bottom
-for (let i = 0; i < 2 * SIDELENGTH; i++) {
-  virtualBoard.push(null);
+  // prepend two rows on bottom
+  for (let i = 0; i < 2 * SIDELENGTH; i++) {
+    virtualBoard.push(null);
+  }
+  return virtualBoard;
 }
 
 module.exports = {
   initialBoard,
-  virtualBoard
+  virtualBoard: createVirtualBoard()
 };

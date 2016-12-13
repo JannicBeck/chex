@@ -3,6 +3,7 @@ const combineReducers = require('redux').combineReducers;
 
 const logger = require('./logger.js');
 
+const calculatePossibleMoves = require('./validator.js');
 const Player = require('./player.js');
 const Pos = require('./position.js');
 const Figure = require('./figure.js');
@@ -13,8 +14,10 @@ const repl = require('repl');
 
 const EMPTY = 'EMPTY';
 
+// actions
 const MOVE = 'MOVE';
 const ROTATE = 'ROTATE';
+
 // const actionReducerMapping = {
 //   MOVE: board,
 //   ROTATE: whiteToMove
@@ -24,13 +27,12 @@ const ROTATE = 'ROTATE';
 //   actionReducerMapping[type](state, action);
 // }
 
-
 const whiteToMove = (state = true, { type }) => {
   switch (type) {
     case ROTATE: return !state;
     default: return state;
   }
-}
+};
 
 const board = (state = initialBoard, { type, payload }) => {
   switch (type) {
@@ -68,11 +70,9 @@ logger(store.getState().board);
 
 store.subscribe(() => {
   logger(store.getState().board);
-  let whiteToMove = store.getState().whiteToMove
+  let whiteToMove = store.getState().whiteToMove;
   console.log(`${whiteToMove ? "White" : "Black"} to move \n`);
 });
-
-let timeout = 1000;
 
 function move (input) {
   let inputList = input.replace('\n', '').toUpperCase().split('-');
@@ -95,13 +95,7 @@ function move (input) {
   }
 }
 
+// console.log(calculatePossibleMoves(Pos.A8, Figure.Rook));
+
 console.log(`${whiteToMove ? "White" : "Black"} to move \n`);
 repl.start({prompt: `> `, eval: move});
-
-
-// const validateMove = require('./validator.js')
-// console.log(validateMove({
-//   from: Pos.D2,
-//   to: Pos.D4,
-//   type: Figure.Rook
-// }));
