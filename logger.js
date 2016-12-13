@@ -24,32 +24,32 @@ const FIGURE_SYMBOLS = {
 };
 
 module.exports = (board) => {
-  let output = '';
   const sideLength = Math.sqrt(board.length);
+  let output = board.reduce(reduceBoardToString, '');
+  console.log(output);
 
-  for (let i = 0; i < board.length; i++) {
-    let square = board[i];
-    if (square) {
-      if (square !== EMPTY) {
-        square = FIGURE_SYMBOLS[square.player][square.type] + ' ';
+  function reduceBoardToString (prev, curr, index) {
+    if (curr) {
+      if (curr !== EMPTY) {
+        curr = FIGURE_SYMBOLS[curr.player][curr.type] + '\u0020';
       } else {
-        square = '\u0020\u0020';
+        curr = '\u0020\u0020';
       }
-
-      let rowIndex = Math.floor(i / sideLength);
-      let squareEven = i % 2 === 0;
+      let rowIndex = Math.floor(index / sideLength);
+      let squareEven = index % 2 === 0;
       let rowEven = rowIndex % 2 !== 0;
       if ((!squareEven && rowEven) || (squareEven && !rowEven)) {
-        square = chalk.bgWhite(square);
+        curr = chalk.bgWhite(curr);
       } else {
-        square = chalk.bgBlack(square);
+        curr = chalk.bgBlack(curr);
       }
     } else {
-      square = chalk.bgCyan.white('XX');
+      curr = chalk.bgCyan.white('XX');
     }
-
-    output += square;
-    if ((i + 1) % sideLength === 0) output += '\n';
+    if ((index + 1) % sideLength === 0) {
+      curr += '\n';
+    }
+    return prev += curr;
   }
-  console.log(output)
 };
+
