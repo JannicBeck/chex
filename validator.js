@@ -1,40 +1,71 @@
 const virtualBoard = require('./board.js').virtualBoard;
-const board = require('./board.js').board;
+const initialBoard = require('./board.js').initialBoard;
 const Figure = require('./figure.js');
 
+const EMPTY = 'EMPTY';
 const VIRTUALBOARDSIDELENGTH = Math.sqrt(virtualBoard.length);
-const BOARDSIDELENGTH = Math.sqrt(board.length);
-  const FIRSTVALIDSQUARE = VIRTUALBOARDSIDELENGTH * 2 + 2;
+const BOARDSIDELENGTH = Math.sqrt(initialBoard.length);
+const FIRSTVALIDSQUARE = VIRTUALBOARDSIDELENGTH * 2 + 2;
 
-function calculatePositionOnVirtualBoard(position) {
+function calculatePositionOnVirtualBoard (position) {
   const rowNumber = (Math.floor(position / BOARDSIDELENGTH));
   return (FIRSTVALIDSQUARE + position) + (rowNumber * 4);
 }
 
 // this should be calculatePositionOnVirtualBoard^-1
-function calculatePositionOnBoard(position) {
+function calculatePositionOnBoard (position) {
   const rowNumber = (Math.floor((position - FIRSTVALIDSQUARE) / BOARDSIDELENGTH));
   return (position - (FIRSTVALIDSQUARE + rowNumber * 4));
 }
 
-module.exports = function isValidMove(position, figure) {
-  return figureMap[figure](position);
+module.exports = function calculatePossibleMoves (position, figure) {
+  return FIGURE_MAPPING[figure](position);
 }
 
-function possbilePawnMoves (position) {
+function calculatePossbilePawnMoves (position) {
   return position + BOARDSIDELENGTH;
 }
 
-function possbileKnightMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position.from);
-  const to = calculatePositionOnVirtualBoard(position.to);
+function calculatePossbileKnightMoves (position) {
+  const from = calculatePositionOnVirtualBoard(position);
 }
 
-const figureMapping = {
-  [Figure.Pawn]: possbilePawnMoves,
-  [Figure.Bishop]: possbileBishopMoves,
-  [Figure.Knight]: possbileKnightMoves,
-  [Figure.King]: possbileKingMoves,
-  [Figure.Queen]: possbileQueenMoves,
-  [Figure.Rook]: possbileRookMoves
+function calculatePossbileRookMoves (position) {
+  let possibleMoves = [];
+  const from = calculatePositionOnVirtualBoard(position);
+  // calculate how many squares are to the left and to the right
+  // e.g. position 3 -> 0,1,2 to the left 4,5,6,7 to the right
+  // slice those
+  let pos = from + 1;
+  while (virtualBoard[pos]) {
+    possibleMoves.push(pos);
+    pos++;
+  }
+  pos = virtualBoard[from - 1];
+  while (virtualBoard[pos]) {
+    possibleMoves.push(pos);
+    pos--;
+  }
+  return possibleMoves;
+}
+
+function calculatePossbileBishopMoves (position) {
+  const from = calculatePositionOnVirtualBoard(position);
+}
+
+function calculatePossbileKingMoves (position) {
+  const from = calculatePositionOnVirtualBoard(position);
+}
+
+function calculatePossbileQueenMoves (position) {
+  const from = calculatePositionOnVirtualBoard(position);
+}
+
+const FIGURE_MAPPING = {
+  [Figure.Pawn]: calculatePossbilePawnMoves,
+  [Figure.Bishop]: calculatePossbileBishopMoves,
+  [Figure.Knight]: calculatePossbileKnightMoves,
+  [Figure.King]: calculatePossbileKingMoves,
+  [Figure.Queen]: calculatePossbileQueenMoves,
+  [Figure.Rook]: calculatePossbileRookMoves
 }
