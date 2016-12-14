@@ -41,10 +41,20 @@ function calculatePossbileRookMoves (position) {
     possibleMoves.push(pos);
     pos++;
   }
-  pos = virtualBoard[from - 1];
+  pos = from - 1;
   while (virtualBoard[pos]) {
     possibleMoves.push(pos);
     pos--;
+  }
+  pos = from + VIRTUALBOARDSIDELENGTH;
+  while (virtualBoard[pos]) {
+    possibleMoves.push(pos);
+    pos += VIRTUALBOARDSIDELENGTH;
+  }
+  pos = from - VIRTUALBOARDSIDELENGTH;
+  while (virtualBoard[pos]) {
+    possibleMoves.push(pos);
+    pos -= VIRTUALBOARDSIDELENGTH;
   }
   return possibleMoves;
 }

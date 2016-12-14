@@ -95,7 +95,7 @@ function move (input) {
   }
 }
 
-// console.log(calculatePossibleMoves(Pos.A8, Figure.Rook));
+console.log(calculatePossibleMoves(Pos.A8, Figure.Rook));
 
 console.log(`${whiteToMove ? "White" : "Black"} to move \n`);
 repl.start({prompt: `> `, eval: move});
