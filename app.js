@@ -93,9 +93,11 @@ function move (input) {
       type: ROTATE
     });
   }
-}
+  console.log(calculatePossibleMoves(Pos[to], store.getState().board));
 
-console.log(calculatePossibleMoves(Pos.A8, Figure.Rook));
+}
+// console.log(calculatePossibleMoves(Pos.A8, store.getState().board));
+
 
 console.log(`${whiteToMove ? "White" : "Black"} to move \n`);
 repl.start({prompt: `> `, eval: move});

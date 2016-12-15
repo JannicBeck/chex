@@ -1,6 +1,9 @@
 const virtualBoard = require('./board.js').virtualBoard;
 const initialBoard = require('./board.js').initialBoard;
 const Figure = require('./figure.js');
+const Player = require('./player.js');
+
+const store = require('./app.js');
 
 const EMPTY = 'EMPTY';
 const VIRTUALBOARDSIDELENGTH = Math.sqrt(virtualBoard.length);
@@ -18,7 +21,8 @@ function calculatePositionOnBoard (position) {
   return (position - (FIRSTVALIDSQUARE + rowNumber * 4));
 }
 
-module.exports = function calculatePossibleMoves (position, figure) {
+module.exports = function calculatePossibleMoves (position, board) {
+  let figure = board[position].type;
   return FIGURE_MAPPING[figure](position);
 }
 
@@ -31,29 +35,61 @@ function calculatePossbileKnightMoves (position) {
 }
 
 function calculatePossbileRookMoves (position) {
+  let player = store.getState().board[position].player;
+  let otherPlayer;
+  if (player === Player.White) {
+    otherPlayer = Player.Black
+  } else {
+    otherPlayer = Player.White;
+  }
   let possibleMoves = [];
   const from = calculatePositionOnVirtualBoard(position);
-  // calculate how many squares are to the left and to the right
-  // e.g. position 3 -> 0,1,2 to the left 4,5,6,7 to the right
-  // slice those
   let pos = from + 1;
   while (virtualBoard[pos]) {
-    possibleMoves.push(pos);
+    if (virtualBoard[pos] === EMPTY) {
+      possibleMoves.push(pos);
+    } else if (virtualBoard[pos].player === player) {
+      break;
+    } else if (virtualBoard[pos].player === otherPlayer) {
+      possibleMoves.push(pos);
+      break;
+    }
     pos++;
   }
   pos = from - 1;
   while (virtualBoard[pos]) {
-    possibleMoves.push(pos);
+    if (virtualBoard[pos] === EMPTY) {
+      possibleMoves.push(pos);
+    } else if (virtualBoard[pos].player === player) {
+      break;
+    } else if (virtualBoard[pos].player === otherPlayer) {
+      possibleMoves.push(pos);
+      break;
+    }
     pos--;
   }
   pos = from + VIRTUALBOARDSIDELENGTH;
   while (virtualBoard[pos]) {
-    possibleMoves.push(pos);
+    if (virtualBoard[pos] === EMPTY) {
+      possibleMoves.push(pos);
+    } else if (virtualBoard[pos].player === player) {
+      break;
+    } else if (virtualBoard[pos].player === otherPlayer) {
+      possibleMoves.push(pos);
+      break;
+    }
     pos += VIRTUALBOARDSIDELENGTH;
   }
   pos = from - VIRTUALBOARDSIDELENGTH;
   while (virtualBoard[pos]) {
-    possibleMoves.push(pos);
+    if (virtualBoard[pos] === EMPTY) {
+      possibleMoves.push(pos);
+    } else if (virtualBoard[pos].player === player) {
+      break;
+    } else if (virtualBoard[pos].player === otherPlayer) {
+      possibleMoves.push(pos);
+      break;
+    }
     pos -= VIRTUALBOARDSIDELENGTH;
   }
   return possibleMoves;
