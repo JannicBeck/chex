@@ -3,7 +3,6 @@ const combineReducers = require('redux').combineReducers;
 
 const logger = require('./logger.js');
 
-const calculatePossibleMoves = require('./validator.js');
 const Player = require('./player.js');
 const Pos = require('./position.js');
 const Figure = require('./figure.js');
@@ -66,6 +65,10 @@ let store = createStore(combineReducers({
   whiteToMove
 }));
 
+module.exports = store;
+
+const calculatePossibleMoves = require('./validator.js');
+
 logger(store.getState().board);
 
 store.subscribe(() => {
@@ -93,10 +96,10 @@ function move (input) {
       type: ROTATE
     });
   }
-  console.log(calculatePossibleMoves(Pos[to], store.getState().board));
+  console.log(calculatePossibleMoves(Pos[to]));
 
 }
-// console.log(calculatePossibleMoves(Pos.A8, store.getState().board));
+console.log(calculatePossibleMoves(Pos.A7));
 
 
 console.log(`${whiteToMove ? "White" : "Black"} to move \n`);

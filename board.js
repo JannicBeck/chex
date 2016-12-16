@@ -47,7 +47,7 @@ for (let i = Pos.A2; i <= Pos.H2; i++) {
   initialBoard[i] = generatePawn(Player.White);
 }
 
-for (let i = Pos.A3; i <= Pos.H6; i++) {
+for (let i = Pos.A6; i <= Pos.H3; i++) {
   initialBoard[i] = EMPTY;
 }
 

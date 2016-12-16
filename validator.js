@@ -21,13 +21,13 @@ function calculatePositionOnBoard (position) {
   return (position - (FIRSTVALIDSQUARE + rowNumber * 4));
 }
 
-module.exports = function calculatePossibleMoves (position, board) {
-  let figure = board[position].type;
+module.exports = function calculatePossibleMoves (position) {
+  let figure = store.getState().board[position].type;
   return FIGURE_MAPPING[figure](position);
 }
 
 function calculatePossbilePawnMoves (position) {
-  return position + BOARDSIDELENGTH;
+  return position - BOARDSIDELENGTH;
 }
 
 function calculatePossbileKnightMoves (position) {
@@ -92,7 +92,7 @@ function calculatePossbileRookMoves (position) {
     }
     pos -= VIRTUALBOARDSIDELENGTH;
   }
-  return possibleMoves;
+  return possibleMoves.map(x => calculatePositionOnBoard(x));
 }
 
 function calculatePossbileBishopMoves (position) {
