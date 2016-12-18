@@ -70,6 +70,7 @@ module.exports = store;
 const calculatePossibleMoves = require('./validator.js');
 
 logger(store.getState().board);
+logger(virtualBoard);
 
 store.subscribe(() => {
   logger(store.getState().board);
@@ -81,8 +82,7 @@ function move (input) {
   let inputList = input.replace('\n', '').toUpperCase().split('-');
   let from = inputList[0];
   let to = inputList[1];
-
-  if (!Pos[from] || !Pos[to]) {
+  if (typeof Pos[from] === 'undefined' || typeof Pos[to] === 'undefined') {
     console.log(chalk.red('Invalid Move!'));
   } else {
     store.dispatch({
@@ -99,7 +99,9 @@ function move (input) {
   console.log(calculatePossibleMoves(Pos[to]));
 
 }
-console.log(calculatePossibleMoves(Pos.A7));
+console.log(calculatePossibleMoves(Pos.A8));
+
+move('a8-a6')
 
 
 console.log(`${whiteToMove ? "White" : "Black"} to move \n`);
