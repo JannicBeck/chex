@@ -1,110 +1,101 @@
-const virtualBoard = require('./board.js').virtualBoard;
-const initialBoard = require('./board.js').initialBoard;
-const Figure = require('./figure.js');
-const Player = require('./player.js');
+const virtualBoard = require('./board.js').virtualBoard
+const initialBoard = require('./board.js').initialBoard
+const Figure = require('./figure.js')
+const Player = require('./player.js')
 
-const store = require('./app.js');
+const store = require('./app.js')
 
-const EMPTY = 'EMPTY';
-const VIRTUALBOARDSIDELENGTH = Math.sqrt(virtualBoard.length);
-const BOARDSIDELENGTH = Math.sqrt(initialBoard.length);
-const FIRSTVALIDSQUARE = VIRTUALBOARDSIDELENGTH * 2 + 2;
+const EMPTY = 'EMPTY'
+const VIRTUALBOARDSIDELENGTH = Math.sqrt(virtualBoard.length)
+const BOARDSIDELENGTH = Math.sqrt(initialBoard.length)
+const FIRSTVALIDSQUARE = VIRTUALBOARDSIDELENGTH * 2 + 2
 
 function calculatePositionOnVirtualBoard (position) {
-  const rowNumber = (Math.floor(position / BOARDSIDELENGTH));
-  return (FIRSTVALIDSQUARE + position) + (rowNumber * 4);
+  const rowNumber = (Math.floor(position / BOARDSIDELENGTH))
+  return (FIRSTVALIDSQUARE + position) + (rowNumber * 4)
 }
 
 // this should be calculatePositionOnVirtualBoard^-1
 function calculatePositionOnBoard (position) {
-  const rowNumber = (Math.floor((position - FIRSTVALIDSQUARE) / BOARDSIDELENGTH));
-  return (position - (FIRSTVALIDSQUARE + rowNumber * 4));
+  const rowNumber = (Math.floor((position - FIRSTVALIDSQUARE) / BOARDSIDELENGTH))
+  return (position - (FIRSTVALIDSQUARE + rowNumber * 4))
+}
+
+function moveNorth (pos) {
+  return pos += BOARDSIDELENGTH
+}
+
+function moveSouth (pos) {
+  return pos -= BOARDSIDELENGTH
+}
+
+function moveWest (pos) {
+  return pos--
+}
+
+function moveEast (pos) {
+  return pos++
 }
 
 module.exports = function calculatePossibleMoves (position) {
-  let figure = store.getState().board[position].type;
-  return FIGURE_MAPPING[figure](position);
+  let figure = store.getState().board[position].type
+  return FIGURE_MAPPING[figure](position)
 }
 
 function calculatePossbilePawnMoves (position) {
-  return position - BOARDSIDELENGTH;
+  let possibleMoves = []
+  possibleMoves.push(position + BOARDSIDELENGTH)
+  console.log(possibleMoves)
+  return possibleMoves
 }
 
 function calculatePossbileKnightMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position);
+  const from = calculatePositionOnVirtualBoard(position)
 }
 
 function calculatePossbileRookMoves (position) {
-  let player = store.getState().board[position].player;
-  let otherPlayer;
+  let player = store.getState().board[position].player
+  let otherPlayer
   if (player === Player.White) {
     otherPlayer = Player.Black
   } else {
-    otherPlayer = Player.White;
+    otherPlayer = Player.White
   }
-  let possibleMoves = [];
-  const from = calculatePositionOnVirtualBoard(position);
-  let pos = from + 1;
+  const from = calculatePositionOnVirtualBoard(position)
+
+  return walk(from + 1, moveEast)
+    .concat(walk(from - 1, moveWest))
+    .concat(walk(from + VIRTUALBOARDSIDELENGTH, moveSouth))
+    .concat(walk(from - VIRTUALBOARDSIDELENGTH, moveNorth))
+    .map(x => calculatePositionOnBoard(x))
+}
+
+function walk (pos, direction) {
+  let result = [];
   while (virtualBoard[pos]) {
     if (virtualBoard[pos] === EMPTY) {
-      possibleMoves.push(pos);
+      result.push(pos)
     } else if (virtualBoard[pos].player === player) {
-      break;
+      break
     } else if (virtualBoard[pos].player === otherPlayer) {
-      possibleMoves.push(pos);
-      break;
+      result.push(pos)
+      break
     }
-    pos++;
+    pos = direction(pos)
   }
-  pos = from - 1;
-  while (virtualBoard[pos]) {
-    if (virtualBoard[pos] === EMPTY) {
-      possibleMoves.push(pos);
-    } else if (virtualBoard[pos].player === player) {
-      break;
-    } else if (virtualBoard[pos].player === otherPlayer) {
-      possibleMoves.push(pos);
-      break;
-    }
-    pos--;
-  }
-  pos = from + VIRTUALBOARDSIDELENGTH;
-  while (virtualBoard[pos]) {
-    if (virtualBoard[pos] === EMPTY) {
-      possibleMoves.push(pos);
-    } else if (virtualBoard[pos].player === player) {
-      break;
-    } else if (virtualBoard[pos].player === otherPlayer) {
-      possibleMoves.push(pos);
-      break;
-    }
-    pos += VIRTUALBOARDSIDELENGTH;
-  }
-  pos = from - VIRTUALBOARDSIDELENGTH;
-  while (virtualBoard[pos]) {
-    if (virtualBoard[pos] === EMPTY) {
-      possibleMoves.push(pos);
-    } else if (virtualBoard[pos].player === player) {
-      break;
-    } else if (virtualBoard[pos].player === otherPlayer) {
-      possibleMoves.push(pos);
-      break;
-    }
-    pos -= VIRTUALBOARDSIDELENGTH;
-  }
-  return possibleMoves.map(x => calculatePositionOnBoard(x));
+  return result;
 }
 
 function calculatePossbileBishopMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position);
+  const from = calculatePositionOnVirtualBoard(position)
 }
 
 function calculatePossbileKingMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position);
+  const from = calculatePositionOnVirtualBoard(position)
 }
 
 function calculatePossbileQueenMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position);
+  const from = calculatePositionOnVirtualBoard(position)
 }
 
 const FIGURE_MAPPING = {
