@@ -21,21 +21,20 @@ function calculatePositionOnBoard (position) {
   return (position - (FIRSTVALIDSQUARE + rowNumber * 4))
 }
 
-function moveNorth (pos) {
-  return pos += BOARDSIDELENGTH
-}
+const compose = (f, g) =>
+                  x => f(g(x))
 
-function moveSouth (pos) {
-  return pos -= BOARDSIDELENGTH
-}
+const move = (increment) =>
+               (pos) => pos + increment
 
-function moveWest (pos) {
-  return pos--
-}
-
-function moveEast (pos) {
-  return pos++
-}
+const moveNorth = move(BOARDSIDELENGTH)
+const moveSouth = move(-BOARDSIDELENGTH)
+const moveWest = move(-1)
+const moveEast = move(1)
+const moveNorthWest = compose(moveNorth, moveWest)
+const moveNorthEast = compose(moveNorth, moveEast)
+const moveSouthWest = compose(moveSouth, moveWest)
+const moveSouthEast = compose(moveSouth, moveEast)
 
 module.exports = function calculatePossibleMoves (position) {
   let figure = store.getState().board[position].type
