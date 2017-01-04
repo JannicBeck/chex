@@ -35,66 +35,75 @@ const moveNorthWest = compose(moveNorth, moveWest)
 const moveNorthEast = compose(moveNorth, moveEast)
 const moveSouthWest = compose(moveSouth, moveWest)
 const moveSouthEast = compose(moveSouth, moveEast)
+const walkWest = walk(moveWest)
+const walkNorth = walk(moveNorth)
+const walkSouth = walk(moveSouth)
+const walkEast = walk(moveEast)
+const walkNorthWest = walk(moveNorthWest)
+const walkNorthEast = walk(moveNorthEast)
+const walkSouthWest = walk(moveSouthWest)
+const walkSouthEast = walk(moveSouthEast)
+
+const walkHorizontal = compose(moveWest, moveEast)
+const walkVertical = compose(moveNorth, moveSouth)
+const walkDiagonal = compose(moveNorthWest, 
+                             moveSoutWest, 
+                             moveNorthEast, 
+                             moveSoutEast)
 
 module.exports = function calculatePossibleMoves (position) {
   let figure = store.getState().board[position].type
+  let player = store.getState().board[position].player
+  const from = calculatePositionOnVirtualBoard(position)
+
   return FIGURE_MAPPING[figure](position)
 }
 
 function calculatePossbilePawnMoves (position) {
-  let possibleMoves = []
-  possibleMoves.push(position + BOARDSIDELENGTH)
-  console.log(possibleMoves)
-  return possibleMoves
+
 }
 
 function calculatePossbileKnightMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position)
 }
 
 function calculatePossbileRookMoves (position) {
-  let player = store.getState().board[position].player
-  let otherPlayer
-  if (player === Player.White) {
-    otherPlayer = Player.Black
-  } else {
-    otherPlayer = Player.White
-  }
-  const from = calculatePositionOnVirtualBoard(position)
-
-  return walk(from + 1, moveEast)
-    .concat(walk(from - 1, moveWest))
-    .concat(walk(from + VIRTUALBOARDSIDELENGTH, moveSouth))
-    .concat(walk(from - VIRTUALBOARDSIDELENGTH, moveNorth))
+  return walkEast(position)
+    .concat(walkWest(position))
+    .concat(walkSouth(position))
+    .concat(walkNorth(position))
     .map(x => calculatePositionOnBoard(x))
 }
 
-function walk (pos, direction) {
-  let result = [];
-  while (virtualBoard[pos]) {
-    if (virtualBoard[pos] === EMPTY) {
-      result.push(pos)
-    } else if (virtualBoard[pos].player === player) {
-      break
-    } else if (virtualBoard[pos].player === otherPlayer) {
-      result.push(pos)
-      break
+const walk = (direction) => {
+  return (pos) => {
+    let result = []
+    while (virtualBoard[pos]) {
+      if (virtualBoard[pos] === EMPTY) {
+        result.push(pos)
+      } else if (virtualBoard[pos].player === player) {
+        break
+      } else {
+        result.push(pos)
+        break
+      }
+      pos = direction(pos)
     }
-    pos = direction(pos)
+    return result
   }
-  return result;
 }
 
 function calculatePossbileBishopMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position)
+  return walkEast(position)
+    .concat(walkWest(position))
+    .concat(walkSouth(position))
+    .concat(walkNorth(position))
+    .map(x => calculatePositionOnBoard(x))
 }
 
 function calculatePossbileKingMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position)
 }
 
 function calculatePossbileQueenMoves (position) {
-  const from = calculatePositionOnVirtualBoard(position)
 }
 
 const FIGURE_MAPPING = {
