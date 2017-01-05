@@ -24,8 +24,31 @@ function calculatePositionOnBoard (position) {
 const compose = (f, g) =>
                   x => f(g(x))
 
+const concat = (...funcs) =>
+                x => funcs.map(f => f(x))
+
 const move = (increment) =>
                (pos) => pos + increment
+
+const walk = (moveInDirection) => {
+  return (pos) => {
+    let result = []
+    while (virtualBoard[pos]) {
+      if (virtualBoard[pos] === EMPTY) {
+        result.push(pos)
+      } else if (virtualBoard[pos].player === player) {
+        break
+      } else {
+        result.push(pos)
+        break
+      }
+      pos = moveInDirection(pos)
+    }
+    return result
+  }
+}
+
+const jump = move(1337)
 
 const moveNorth = move(BOARDSIDELENGTH)
 const moveSouth = move(-BOARDSIDELENGTH)
@@ -35,21 +58,36 @@ const moveNorthWest = compose(moveNorth, moveWest)
 const moveNorthEast = compose(moveNorth, moveEast)
 const moveSouthWest = compose(moveSouth, moveWest)
 const moveSouthEast = compose(moveSouth, moveEast)
-const walkWest = walk(moveWest)
+
+// does not work that way merge ifs into move!!
+const moveDiagonal = concat(moveNorthWest,
+                            moveSoutEast,
+                            moveNorthEast,
+                            moveSoutWest)
+
+const movePerpendicular = concat(moveNorth,
+                                 moveSouth,
+                                 moveWest,
+                                 moveEast)
+
 const walkNorth = walk(moveNorth)
 const walkSouth = walk(moveSouth)
+const walkWest = walk(moveWest)
 const walkEast = walk(moveEast)
 const walkNorthWest = walk(moveNorthWest)
 const walkNorthEast = walk(moveNorthEast)
 const walkSouthWest = walk(moveSouthWest)
 const walkSouthEast = walk(moveSouthEast)
 
-const walkHorizontal = compose(moveWest, moveEast)
-const walkVertical = compose(moveNorth, moveSouth)
-const walkDiagonal = compose(moveNorthWest, 
-                             moveSoutWest, 
-                             moveNorthEast, 
-                             moveSoutEast)
+const walkDiagonal = concat(walkNorthWest,
+                            walkSoutEast,
+                            walkNorthEast,
+                            walkSoutWest)
+
+const walkPerpendicular = concat(walkNorth,
+                                 walkSouth,
+                                 walkWest,
+                                 walkEast)
 
 module.exports = function calculatePossibleMoves (position) {
   let figure = store.getState().board[position].type
@@ -66,45 +104,12 @@ function calculatePossbilePawnMoves (position) {
 function calculatePossbileKnightMoves (position) {
 }
 
-function calculatePossbileRookMoves (position) {
-  return walkEast(position)
-    .concat(walkWest(position))
-    .concat(walkSouth(position))
-    .concat(walkNorth(position))
-    .map(x => calculatePositionOnBoard(x))
-}
+const calculatePossbileRookMoves = walkPerpendicular
+const calculatePossbileBishopMoves = walkDiagonal
 
-const walk = (direction) => {
-  return (pos) => {
-    let result = []
-    while (virtualBoard[pos]) {
-      if (virtualBoard[pos] === EMPTY) {
-        result.push(pos)
-      } else if (virtualBoard[pos].player === player) {
-        break
-      } else {
-        result.push(pos)
-        break
-      }
-      pos = direction(pos)
-    }
-    return result
-  }
-}
+const calculatePossbileKingMoves = compose(moveNorth, move)
 
-function calculatePossbileBishopMoves (position) {
-  return walkEast(position)
-    .concat(walkWest(position))
-    .concat(walkSouth(position))
-    .concat(walkNorth(position))
-    .map(x => calculatePositionOnBoard(x))
-}
-
-function calculatePossbileKingMoves (position) {
-}
-
-function calculatePossbileQueenMoves (position) {
-}
+const calculatePossbileQueenMoves = compose(walkPerpendicular, walkDiagonal)
 
 const FIGURE_MAPPING = {
   [Figure.Pawn]: calculatePossbilePawnMoves,
