@@ -78,14 +78,17 @@ store.subscribe(() => {
   console.log(`${whiteToMove ? "White" : "Black"} to move \n`)
 })
 
+function isValidMove (from, to) {
+  return calculatePossibleMoves(Pos[from]).indexOf(Pos[to]) > -1
+}
+
 function move (input) {
   let inputList = input.replace('\n', '').toUpperCase().split('-')
   let from = inputList[0]
   let to = inputList[1]
   if (typeof Pos[from] === 'undefined' 
-    || typeof Pos[to] === 'undefined') {
-    console.log(chalk.red('Invalid Input!'))
-  } else if (calculatePossibleMoves(Pos[from]).indexOf(Pos[to]) < 0) {
+    || typeof Pos[to] === 'undefined'
+    || !isValidMove(from, to)) {
     console.log(chalk.red('Invalid Move!'))
     console.log('Possible Moves: ', calculatePossibleMoves(Pos[from]))
   } else {
@@ -102,7 +105,7 @@ function move (input) {
   }
 }
 
-// move('a7-a6')
+move('a7-a6')
 
 console.log(`${whiteToMove ? "White" : "Black"} to move \n`)
 repl.start({prompt: `> `, eval: move})
