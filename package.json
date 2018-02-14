@@ -1,5 +1,5 @@
 {
-  "name": "CheX",
+  "name": "chex",
   "version": "0.1.0",
   "description": "Chess with Redux",
   "main": "index.js",
@@ -8,10 +8,8 @@
   },
   "repository": "https://github.com/JannicBeck/chex",
   "author": "jannicbeck <jannicbeck@gmail.com>",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "dependencies": {
-    "gzip": "^0.1.0",
-    "redux": "^3.6.0"
   },
   "devDependencies": {
     "chalk": "^1.1.3"
