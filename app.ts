@@ -1,14 +1,33 @@
-const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
-const concat = (...fns) => (...args) => fns.reduce((y, f) => y.concat(f(...args)), [])
+type Move = (p: Pos) => number
+type Steps = number
 
-// the board width equals the width of a
-// chess board (8) + 2 files for the knight problem
-const boardWidth = 10
+const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f(g(x))
 
-const move = steps => pos => steps + pos
+const map = Array.prototype.map
 
-const moveNorth = move(boardWidth)
-const moveSouth = move(-boardWidth)
+enum Pos {
+  A8, B8, C8, D8, E8, F8, G8, H8,
+  A7, B7, C7, D7, E7, F7, G7, H7,
+  A6, B6, C6, D6, E6, F6, G6, H6,
+  A5, B5, C5, D5, E5, F5, G5, H5,
+  A4, B4, C4, D4, E4, F4, G4, H4,
+  A3, B3, C3, D3, E3, F3, G3, H3,
+  A2, B2, C2, D2, E2, F2, G2, H2,
+  A1, B1, C1, D1, E1, F1, G1, H1
+}
+
+const FIGURE_SYMBOLS = {
+  p: '♙', b: '♗', k: '♔', q: '♕', r: '♖', n: '♘',
+  P: '♟', B: '♝', K: '♚', Q: '♛', R: '♜', N: '♞'
+}
+
+// TODO add 2 files for the knight problem
+const boardSideLength = 8
+
+const move = (s: Steps) => (p: Pos) => s + p
+
+const moveNorth = move(boardSideLength)
+const moveSouth = move(-boardSideLength)
 const moveWest = move(-1)
 const moveEast = move(1)
 const moveNorthWest = compose(moveNorth, moveWest)
@@ -16,7 +35,7 @@ const moveNorthEast = compose(moveNorth, moveEast)
 const moveSouthWest = compose(moveSouth, moveWest)
 const moveSouthEast = compose(moveSouth, moveEast)
 
-const jump = x => y => compose(compose(x, x), y)
+const jump = (f: Move) => (g: Move) => compose(compose(f, f), g)
 const jumpNorth = jump(moveNorth)
 const jumpSouth = jump(moveSouth)
 const jumpWest  = jump(moveWest)
@@ -30,52 +49,6 @@ const jumpWestNorth = jumpWest (moveNorth)
 const jumpWestSouth = jumpWest (moveSouth)
 const jumpEastNorth = jumpEast (moveNorth)
 const jumpEastSouth = jumpEast (moveSouth)
-
-const moveDiagonal = concat(moveNorthWest,
-                            moveSouthEast,
-                            moveNorthEast,
-                            moveSouthWest)
-
-const movePerpendicular = concat(moveNorth,
-                                 moveSouth,
-                                 moveWest,
-                                 moveEast)
-
-// const walkNorth = walk(moveNorth)
-// const walkSouth = walk(moveSouth)
-// const walkWest = walk(moveWest)
-// const walkEast = walk(moveEast)
-// const walkNorthWest = walk(moveNorthWest)
-// const walkNorthEast = walk(moveNorthEast)
-// const walkSouthWest = walk(moveSouthWest)
-// const walkSouthEast = walk(moveSouthEast)
-
-// const walkDiagonal = concat(walkNorthWest,
-//                             walkSouthEast,
-//                             walkNorthEast,
-//                             walkSouthWest)
-
-// const walkStraight = concat(walkNorth, walkSouth)
-// const walkSideways = concat(walkWest, walkEast)
-
-// const walkPerpendicular = concat(walkStraight, walkSideways)
-
-// // const calculatePossibleKnightMoves = safeJump
-// const calculatePossiblePawnMoves = walkStraight
-// const calculatePossibleRookMoves = walkPerpendicular
-// const calculatePossibleBishopMoves = walkDiagonal
-// const calculatePossibleKingMoves = concat(movePerpendicular, moveDiagonal)
-// const calculatePossibleQueenMoves = concat(walkPerpendicular, walkDiagonal)
-
-// const FIGURE_MAPPING = {
-//   [Figure.Pawn]: calculatePossiblePawnMoves,
-//   [Figure.Bishop]: calculatePossibleBishopMoves,
-//   [Figure.Knight]: calculatePossibleKnightMoves,
-//   [Figure.King]: calculatePossibleKingMoves,
-//   [Figure.Queen]: calculatePossibleQueenMoves,
-//   [Figure.Rook]: calculatePossibleRookMoves
-// }
-
 
 // type Square = Maybe Piece
 type Square = Piece
@@ -113,46 +86,43 @@ const initialBoardStr = unlines(['rnbqkbnr'
 //
 // * White pices are "PNBRQK"
 // * Black pieces are "pnbrqk"
-type ReadPiece = (x: string) => PType
+type ReadPiece = (x: string) => Piece
 const readPiece: ReadPiece = x => {
   switch(x) {
-    case 'p': return PType.Pawn
-    case 'k': return PType.Knight
-    case 'b': return PType.Bishop
-    case 'r': return PType.Rook
-    case 'q': return PType.Queen
-    case 'k': return PType.King
+    case FIGURE_SYMBOLS.p: return { type: PType.Pawn,   color: PColor.White }
+    case FIGURE_SYMBOLS.k: return { type: PType.Knight, color: PColor.White }
+    case FIGURE_SYMBOLS.b: return { type: PType.Bishop, color: PColor.White }
+    case FIGURE_SYMBOLS.r: return { type: PType.Rook,   color: PColor.White }
+    case FIGURE_SYMBOLS.q: return { type: PType.Queen,  color: PColor.White }
+    case FIGURE_SYMBOLS.k: return { type: PType.King,   color: PColor.White }
+    case FIGURE_SYMBOLS.p: return { type: PType.Pawn,   color: PColor.Black }
+    case FIGURE_SYMBOLS.k: return { type: PType.Knight, color: PColor.Black }
+    case FIGURE_SYMBOLS.b: return { type: PType.Bishop, color: PColor.Black }
+    case FIGURE_SYMBOLS.r: return { type: PType.Rook,   color: PColor.Black }
+    case FIGURE_SYMBOLS.q: return { type: PType.Queen,  color: PColor.Black }
+    case FIGURE_SYMBOLS.k: return { type: PType.King,   color: PColor.Black }
   }
 }
 
-// // | Read a square using FEN notation or ' ' for an empty square
+// | Read a square using FEN notation or ' ' for an empty square
 type ReadSquare = (x: string) => Square
 const readSquare = (x: string) => x === ' ' ? null : readPiece(x)
 
 type ReadBoard = (x: string) => Board
-const readRow = Array.prototype.map(readSquare)
-const readBoard = Array.prototype.map(compose(readRow, lines))
+const readRow = map.bind(null, readSquare)
+const readBoard = map.bind(null, (compose(readRow, lines)))
 
 // | Shows a piece using FEN notation
 //
 // * White pices are "PNBRQK"
 // * Black pieces are "pnbrqk"
 type ShowPiece = (p: Piece) => string
-const showPiece: ShowPiece = p => {
-  switch(p.type) {
-    case PType.Pawn   : return 'p'
-    case PType.Knight : return 'k'
-    case PType.Bishop : return 'b'
-    case PType.Rook   : return 'r'
-    case PType.Queen  : return 'q'
-    case PType.King   : return 'k'
-  }
-}
+const showPiece: ShowPiece = p => FIGURE_SYMBOLS[p.type]
 
-// // | Show a square using FEN notation or ' ' for an empty square
+// | Show a square using FEN notation or ' ' for an empty square
 type ShowSquare = (s: Square) => string
 const showSquare = showPiece
 
 type ShowBoard = (b: Board) => string
-const showRow = Array.prototype.map(showSquare)
-const showBoard = compose(unlines, Array.prototype.map)(showRow)
+const showRow = map.bind(null, showSquare)
+const showBoard = compose(unlines, map)(showRow)
