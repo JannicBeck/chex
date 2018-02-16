@@ -1,9 +1,20 @@
 type Move = (p: Pos) => number
-type Steps = number
+type BoardSideLength = 8
+type NegativeBoardSideLength = -8
+type Steps = 1 | -1 | BoardSideLength | NegativeBoardSideLength
+type Empty = ' '
+
+// | White pices are "PNBRQK"
+// | Black pieces are "pnbrqk"
+enum Piece {
+  p = 'p', n = 'n', b = 'b', r = 'r', q = 'q', k = 'k',
+  P = 'P', N = 'N', B = 'B', R = 'R', Q = 'Q', K = 'K'
+}
+
+const EMPTY: Empty = ' '
 
 const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f(g(x))
-
-const map = Array.prototype.map
+const map = <T, R>(mapper: (x: T) => R) => (a: ReadonlyArray<T>) => a.map(mapper)
 
 enum Pos {
   A8, B8, C8, D8, E8, F8, G8, H8,
@@ -16,18 +27,19 @@ enum Pos {
   A1, B1, C1, D1, E1, F1, G1, H1
 }
 
-const FIGURE_SYMBOLS = {
-  p: '♙', b: '♗', k: '♔', q: '♕', r: '♖', n: '♘',
-  P: '♟', B: '♝', K: '♚', Q: '♛', R: '♜', N: '♞'
+const PIECE_SYMBOLS = {
+  [Piece.p]: '♙', [Piece.n]: '♘', [Piece.b]: '♗', [Piece.r]: '♖', [Piece.q]: '♕', [Piece.k]: '♔',
+  [Piece.P]: '♟', [Piece.N]: '♞', [Piece.B]: '♝', [Piece.R]: '♜', [Piece.Q]: '♛', [Piece.K]: '♚',
 }
 
 // TODO add 2 files for the knight problem
-const boardSideLength = 8
+const boardSideLength: BoardSideLength = 8
+const negativeBoardSideLength: NegativeBoardSideLength = -8
 
 const move = (s: Steps) => (p: Pos) => s + p
 
 const moveNorth = move(boardSideLength)
-const moveSouth = move(-boardSideLength)
+const moveSouth = move(negativeBoardSideLength)
 const moveWest = move(-1)
 const moveEast = move(1)
 const moveNorthWest = compose(moveNorth, moveWest)
@@ -50,79 +62,43 @@ const jumpWestSouth = jumpWest (moveSouth)
 const jumpEastNorth = jumpEast (moveNorth)
 const jumpEastSouth = jumpEast (moveSouth)
 
-// type Square = Maybe Piece
-type Square = Piece
+type Square = Piece | Empty
 
-interface Piece {
-  color: PColor,
-  type: PType
-}
-
-enum PColor {
+enum PlayerColor {
   White,
   Black
 }
 
-enum PType {
-  Pawn, Knight, Bishop, Rook, Queen, King
-}
+type Board = ReadonlyArray<ReadonlyArray<Square>>
 
-type Board = Square[][]
+const lines = <T>(x: ReadonlyArray<T>) => x
+const unlines = <T>(x: ReadonlyArray<T>) => x
 
-const unlines = <T>(x: T) => x
-const lines = <T>(x: T) => x
-
-const initialBoardStr = unlines(['rnbqkbnr'
-                                ,'pppppppp'
-                                ,'        '
-                                ,'        '
-                                ,'        '
-                                ,'        '
-                                ,'PPPPPPPP'
-                                ,'RNBQKBNR'
-                                ])
-
-// | Shows a piece using FEN notation
-//
-// * White pices are "PNBRQK"
-// * Black pieces are "pnbrqk"
-type ReadPiece = (x: string) => Piece
-const readPiece: ReadPiece = x => {
-  switch(x) {
-    case FIGURE_SYMBOLS.p: return { type: PType.Pawn,   color: PColor.White }
-    case FIGURE_SYMBOLS.k: return { type: PType.Knight, color: PColor.White }
-    case FIGURE_SYMBOLS.b: return { type: PType.Bishop, color: PColor.White }
-    case FIGURE_SYMBOLS.r: return { type: PType.Rook,   color: PColor.White }
-    case FIGURE_SYMBOLS.q: return { type: PType.Queen,  color: PColor.White }
-    case FIGURE_SYMBOLS.k: return { type: PType.King,   color: PColor.White }
-    case FIGURE_SYMBOLS.p: return { type: PType.Pawn,   color: PColor.Black }
-    case FIGURE_SYMBOLS.k: return { type: PType.Knight, color: PColor.Black }
-    case FIGURE_SYMBOLS.b: return { type: PType.Bishop, color: PColor.Black }
-    case FIGURE_SYMBOLS.r: return { type: PType.Rook,   color: PColor.Black }
-    case FIGURE_SYMBOLS.q: return { type: PType.Queen,  color: PColor.Black }
-    case FIGURE_SYMBOLS.k: return { type: PType.King,   color: PColor.Black }
-  }
-}
+const initialBoardStr = `rnbqkbnr`
+                      + `pppppppp`
+                      + `        `
+                      + `        `
+                      + `        `
+                      + `        `
+                      + `PPPPPPPP`
+                      + `RNBQKBNR`
 
 // | Read a square using FEN notation or ' ' for an empty square
 type ReadSquare = (x: string) => Square
-const readSquare = (x: string) => x === ' ' ? null : readPiece(x)
+const readSquare: ReadSquare = x => Object.keys(PIECE_SYMBOLS).find(key => PIECE_SYMBOLS[key] === x) as Piece || EMPTY
 
 type ReadBoard = (x: string) => Board
-const readRow = map.bind(null, readSquare)
-const readBoard = map.bind(null, (compose(readRow, lines)))
+const readRow = map(readSquare)
+const readBoard = map(compose(readRow, lines))
 
 // | Shows a piece using FEN notation
-//
-// * White pices are "PNBRQK"
-// * Black pieces are "pnbrqk"
 type ShowPiece = (p: Piece) => string
-const showPiece: ShowPiece = p => FIGURE_SYMBOLS[p.type]
+const showPiece: ShowPiece = p => PIECE_SYMBOLS[p]
 
 // | Show a square using FEN notation or ' ' for an empty square
 type ShowSquare = (s: Square) => string
 const showSquare = showPiece
 
 type ShowBoard = (b: Board) => string
-const showRow = map.bind(null, showSquare)
+const showRow = map(showSquare)
 const showBoard = compose(unlines, map)(showRow)
