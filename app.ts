@@ -45,6 +45,8 @@
 
 type Move = (p: Pos) => number
 type BoardSideLength = 8
+// | This type is used in the FEN notation to represent a blank row
+type EmptyRow = '8'
 type NegativeBoardSideLength = -8
 type Steps = 1 | -1 | BoardSideLength | NegativeBoardSideLength
 type Empty = ' '
@@ -59,7 +61,21 @@ enum Piece {
 const EMPTY: Empty = ' '
 
 const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f(g(x))
-const map = <T, R>(mapper: (x: T) => R) => (a: ReadonlyArray<T>) => a.map(mapper)
+const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
+const split = <T>(seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
+const join = <T>(seperator: string) => (xs: ReadonlyArray<T>) => xs.join(seperator)
+const flatten = <T> (x: ReadonlyArray<(T | ReadonlyArray<T>)>) => [].concat(...x) as ReadonlyArray<T>
+const complement = <T>(f: (x: T) => boolean) => (x: T) => !f(x)
+const tail = <T>(xs: ReadonlyArray<T>) => xs.slice(0, xs.length - 1 - 1)
+const head = <T>(xs: ReadonlyArray<T>) => xs[0]
+const last = <T>(xs: ReadonlyArray<T>) => xs[xs.length - 1]
+const init = <T>(xs: ReadonlyArray<T>) => xs.slice(1, xs.length - 1)
+const range = (start: number, end: number, xs: ReadonlyArray<number> = []): ReadonlyArray<number> =>
+  start === end
+  ? xs
+  : range(++start, end, xs.concat(start))
+
+const isNumber = complement(Number.isNaN)
 
 enum Pos {
   A8, B8, C8, D8, E8, F8, G8, H8,
@@ -94,7 +110,7 @@ const moveNorthEast = compose(moveNorth, moveEast)
 const moveSouthWest = compose(moveSouth, moveWest)
 const moveSouthEast = compose(moveSouth, moveEast)
 
-const jump = (f: Move) => (g: Move) => compose(compose(f, f), g)
+const jump = (f: Move) => (g: Move) => compose(g, compose(f, f))
 const jumpNorth = jump(moveNorth)
 const jumpSouth = jump(moveSouth)
 const jumpWest  = jump(moveWest)
@@ -118,7 +134,10 @@ enum PlayerColor {
 
 type Board = ReadonlyArray<ReadonlyArray<Square>>
 
+// | lines breaks a string up into a list of strings at forward slashes. The resulting strings do not contain forward slashes.
 const lines = <T>(x: ReadonlyArray<T>) => x
+
+// | unlines is an inverse operation to lines. It joins lines, after appending a terminating newline to each.
 const unlines = <T>(x: ReadonlyArray<T>) => x
 
 const initialBoard = `rnbqkbnr/`
@@ -128,7 +147,22 @@ const initialBoard = `rnbqkbnr/`
                    + `${boardSideLength}/`
                    + `${boardSideLength}/`
                    + `PPPPPPPP/`
-                   + `RNBQKBNR/`
+                   + `RNBQKBNR`
+
+const splitForwardSlash = split('/')
+const splitChars= split('')
+
+const splitBoard = compose(map(splitChars), splitForwardSlash)
+
+const generateEmptyRow = (x: Piece | EmptyRow) =>
+  isNumber(Number.parseInt(x)) && Number.parseInt(x) === boardSideLength
+  ? map(_ => EMPTY)(range(0, boardSideLength))
+  : x
+
+const insertEmptyRows = map(generateEmptyRow)
+const parseBoard = compose(insertEmptyRows, compose(flatten, splitBoard))
+const x = parseBoard(initialBoard)
+x
 
 // | The FEN consists of 6 sections seperated by blanks
 // * {Piece placement} {Active colour} {Castling availability} {En passant target square} {Halfmove clock} {Fullmove number}
