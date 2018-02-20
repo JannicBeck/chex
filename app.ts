@@ -134,12 +134,6 @@ enum PlayerColor {
 
 type Board = ReadonlyArray<Square>
 
-// | lines breaks a string up into a list of strings at forward slashes. The resulting strings do not contain forward slashes.
-const lines = <T>(x: ReadonlyArray<T>) => x
-
-// | unlines is an inverse operation to lines. It joins lines, after appending a terminating newline to each.
-const unlines = <T>(x: ReadonlyArray<T>) => x
-
 const initialBoard = `rnbqkbnr/`
                    + `pppppppp/`
                    + `${boardSideLength}/`
