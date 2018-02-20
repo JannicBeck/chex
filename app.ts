@@ -132,7 +132,7 @@ enum PlayerColor {
   Black
 }
 
-type Board = ReadonlyArray<ReadonlyArray<Square>>
+type Board = ReadonlyArray<Square>
 
 // | lines breaks a string up into a list of strings at forward slashes. The resulting strings do not contain forward slashes.
 const lines = <T>(x: ReadonlyArray<T>) => x
