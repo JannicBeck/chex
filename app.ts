@@ -64,7 +64,7 @@ const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f
 const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
 const split = <T>(seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
 const join = <T>(seperator: string) => (xs: ReadonlyArray<T>) => xs.join(seperator)
-const flatten = <T> (x: ReadonlyArray<(T | ReadonlyArray<T>)>) => [].concat(...x) as ReadonlyArray<T>
+const flatten = <T> (xs: ReadonlyArray<T>) => [].concat(...xs) as ReadonlyArray<T>
 const complement = <T>(f: (x: T) => boolean) => (x: T) => !f(x)
 const tail = <T>(xs: ReadonlyArray<T>) => xs.slice(0, xs.length - 1 - 1)
 const head = <T>(xs: ReadonlyArray<T>) => xs[0]
@@ -98,6 +98,7 @@ const PIECE_SYMBOLS = {
 // TODO add 2 files for the knight problem
 const boardSideLength: BoardSideLength = 8
 const negativeBoardSideLength: NegativeBoardSideLength = -8
+const emptyRow = boardSideLength.toString()
 
 const move = (s: Steps) => (p: Pos) => s + p
 
@@ -148,14 +149,20 @@ const splitChars= split('')
 
 const splitBoard = compose(map(splitChars), splitForwardSlash)
 
+type MapToEmpty = <T>(xs: ReadonlyArray<T>) => Empty[]
+const mapToEmpty = map(_ => EMPTY) as MapToEmpty
+
+// type GenerateEmptyRow = (x: Piece | EmptyRow)
 const generateEmptyRow = (x: Piece | EmptyRow) =>
-  isNumber(Number.parseInt(x)) && Number.parseInt(x) === boardSideLength
-  ? map(_ => EMPTY)(range(0, boardSideLength))
+  x === '8'
+  ? mapToEmpty(range(0, boardSideLength))
   : x
 
 const insertEmptyRows = map(generateEmptyRow)
-const parseBoard = compose(insertEmptyRows, compose(flatten, splitBoard))
+const xx =  compose(insertEmptyRows, compose(flatten, splitBoard))
+const parseBoard = compose(flatten, xx)
 const x = parseBoard(initialBoard)
+
 x
 
 // | The FEN consists of 6 sections seperated by blanks
@@ -195,10 +202,6 @@ x
 type ReadSquare = (x: string) => Square
 const readSquare: ReadSquare = x => PIECE_SYMBOLS[x] || EMPTY
 
-type ReadBoard = (x: string) => Board
-const readRow = map(readSquare)
-const readBoard = map(compose(readRow, lines))
-
 // | Shows a piece using FEN notation
 type ShowPiece = (p: Piece) => string
 const showPiece: ShowPiece = p => PIECE_SYMBOLS[p]
@@ -208,5 +211,5 @@ type ShowSquare = (s: Square) => string
 const showSquare = showPiece
 
 type ShowBoard = (b: Board) => string
-const showRow = map(showSquare)
-const showBoard = compose(unlines, map)(showRow)
+const showBoard = map(showSquare)
+
