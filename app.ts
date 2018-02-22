@@ -166,8 +166,8 @@ const splitBoard = splitForwardSlash
 
 const insertEmptyRows = map(emptyRowMapper)
 const parseBoard = compose(flatten, compose(insertEmptyRows, splitBoard))
-const board = parseBoard(initialBoard)
-board
+const board = parseBoard(initialBoard) as Board
+
 // | The FEN consists of 6 sections seperated by blanks
 // * {Piece placement} {Active colour} {Castling availability} {En passant target square} {Halfmove clock} {Fullmove number}
 //
@@ -213,6 +213,10 @@ const showPiece: ShowPiece = p => PIECE_SYMBOLS[p]
 type ShowSquare = (s: Square) => string
 const showSquare = showPiece
 
-type ShowBoard = (b: Board) => string
-const showBoard = map(showSquare)
+const showRow = compose(joinChars, compose(map(showSquare), splitChars))
 
+type ShowBoard = (b: Board) => string
+const showBoard = map(showRow)
+
+const x = showBoard(board)
+x
