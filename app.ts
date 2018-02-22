@@ -60,6 +60,8 @@ enum Piece {
 
 const EMPTY: Empty = ' '
 
+const identity = <T>(x: T) => x
+const ifElse = <T, R1, R2>(c: (x: T) => boolean) => (f: (x: T) => R1) => (g: (x: T) => R2) => (x: T) => c(x) ? f(x): g(x)
 const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f(g(x))
 const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
 const split = <T>(seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
@@ -146,24 +148,20 @@ const initialBoard = `rnbqkbnr/`
 
 const splitForwardSlash = split('/')
 const splitChars= split('')
-
-const splitBoard = compose(map(splitChars), splitForwardSlash)
+const joinChars = join('')
 
 type MapToEmpty = <T>(xs: ReadonlyArray<T>) => Empty[]
 const mapToEmpty = map(_ => EMPTY) as MapToEmpty
 
-// type GenerateEmptyRow = (x: Piece | EmptyRow)
-const generateEmptyRow = (x: Piece | EmptyRow) =>
-  x === '8'
-  ? mapToEmpty(range(0, boardSideLength))
-  : x
+const mapEmptyRow = _ => mapToEmpty(range(0, boardSideLength)).join('')
 
-const insertEmptyRows = map(generateEmptyRow)
-const xx =  compose(insertEmptyRows, compose(flatten, splitBoard))
-const parseBoard = compose(flatten, xx)
-const x = parseBoard(initialBoard)
+const emptyRowMapper = ifElse((x: string | EmptyRow) => x === boardSideLength.toString())(mapEmptyRow)(identity)
 
-x
+const splitBoard = splitForwardSlash
+
+const insertEmptyRows = map(emptyRowMapper)
+const parseBoard = compose(flatten, compose(insertEmptyRows, splitBoard))
+const board = parseBoard(initialBoard)
 
 // | The FEN consists of 6 sections seperated by blanks
 // * {Piece placement} {Active colour} {Castling availability} {En passant target square} {Halfmove clock} {Fullmove number}
