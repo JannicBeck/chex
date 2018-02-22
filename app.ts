@@ -155,14 +155,19 @@ const mapToEmpty = map(_ => EMPTY) as MapToEmpty
 
 const mapEmptyRow = _ => mapToEmpty(range(0, boardSideLength)).join('')
 
-const emptyRowMapper = ifElse((x: string | EmptyRow) => x === boardSideLength.toString())(mapEmptyRow)(identity)
+const isEmptyRow = (x: string | EmptyRow) => x === boardSideLength.toString()
+
+const emptyRowMapper =
+  ifElse(isEmptyRow)
+    (mapEmptyRow)
+    (identity)
 
 const splitBoard = splitForwardSlash
 
 const insertEmptyRows = map(emptyRowMapper)
 const parseBoard = compose(flatten, compose(insertEmptyRows, splitBoard))
 const board = parseBoard(initialBoard)
-
+board
 // | The FEN consists of 6 sections seperated by blanks
 // * {Piece placement} {Active colour} {Castling availability} {En passant target square} {Halfmove clock} {Fullmove number}
 //
