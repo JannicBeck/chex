@@ -49,7 +49,6 @@ type BoardSideLength = 8
 type EmptyRow = '8'
 type NegativeBoardSideLength = -8
 type Steps = 1 | -1 | BoardSideLength | NegativeBoardSideLength
-type Empty = ' '
 
 // | White pices are "PNBRQK"
 // * Black pieces are "pnbrqk"
@@ -58,15 +57,25 @@ enum Piece {
   P = 'P', N = 'N', B = 'B', R = 'R', Q = 'Q', K = 'K'
 }
 
-const EMPTY: Empty = ' '
+type Empty = ' '
+const empty = ' '
+
+type Square = Empty | Piece
+
+enum PlayerColor {
+  White,
+  Black
+}
+
+type Board = ReadonlyArray<Square>
 
 const identity = <T>(x: T) => x
-const ifElse = <T, R1, R2>(c: (x: T) => boolean) => (f: (x: T) => R1) => (g: (x: T) => R2) => (x: T) => c(x) ? f(x): g(x)
+const ifElse = <T>(c: (x: T) => boolean) => <R1>(f: (x: T) => R1) => <R2>(g: (x: T) => R2) => (x: T) => c(x) ? f(x): g(x)
 const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f(g(x))
 const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
-const split = <T>(seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
-const join = <T>(seperator: string) => (xs: ReadonlyArray<T>) => xs.join(seperator)
-const flatten = <T> (xs: ReadonlyArray<T>) => [].concat(...xs) as ReadonlyArray<T>
+const split = (seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
+const join = (seperator: string) => <T>(xs: ReadonlyArray<T>) => xs.join(seperator)
+const flatten = <T>(xs: ReadonlyArray<T>) => [].concat(...xs) as ReadonlyArray<T>
 const complement = <T>(f: (x: T) => boolean) => (x: T) => !f(x)
 const tail = <T>(xs: ReadonlyArray<T>) => xs.slice(0, xs.length - 1 - 1)
 const head = <T>(xs: ReadonlyArray<T>) => xs[0]
@@ -91,10 +100,10 @@ enum Pos {
 }
 
 const PIECE_SYMBOLS = {
-  [Piece.p]: '♙', [Piece.n]: '♘', [Piece.b]: '♗', [Piece.r]: '♖', [Piece.q]: '♕', [Piece.k]: '♔',
-  [Piece.P]: '♟', [Piece.N]: '♞', [Piece.B]: '♝', [Piece.R]: '♜', [Piece.Q]: '♛', [Piece.K]: '♚',
-  '♙': [Piece.p], '♘': [Piece.n], '♗': [Piece.b], '♖': [Piece.r], '♕': [Piece.q], '♔': [Piece.k],
-  '♟': [Piece.P], '♞': [Piece.N], '♝': [Piece.B], '♜': [Piece.R], '♛': [Piece.Q], '♚': [Piece.K]
+  'p': '♙', 'n': '♘', 'b': '♗', 'r': '♖', 'q': '♕', 'k': '♔',
+  'P': '♟', 'N': '♞', 'B': '♝', 'R': '♜', 'Q': '♛', 'K': '♚',
+  '♙': 'p', '♘': 'n', '♗': 'b', '♖': 'r', '♕': 'q', '♔': 'k',
+  '♟': 'P', '♞': 'N', '♝': 'B', '♜': 'R', '♛': 'Q', '♚': 'K'
 }
 
 // TODO add 2 files for the knight problem
@@ -128,21 +137,13 @@ const jumpWestSouth = jumpWest (moveSouth)
 const jumpEastNorth = jumpEast (moveNorth)
 const jumpEastSouth = jumpEast (moveSouth)
 
-type Square = Piece | Empty
-
-enum PlayerColor {
-  White,
-  Black
-}
-
-type Board = ReadonlyArray<Square>
-
+// | The initial board in FEN notation, 8 stands for an empty row
 const initialBoard = `rnbqkbnr/`
                    + `pppppppp/`
-                   + `${boardSideLength}/`
-                   + `${boardSideLength}/`
-                   + `${boardSideLength}/`
-                   + `${boardSideLength}/`
+                   + `8`
+                   + `8`
+                   + `8`
+                   + `8`
                    + `PPPPPPPP/`
                    + `RNBQKBNR`
 
@@ -150,10 +151,8 @@ const splitForwardSlash = split('/')
 const splitChars= split('')
 const joinChars = join('')
 
-type MapToEmpty = <T>(xs: ReadonlyArray<T>) => Empty[]
-const mapToEmpty = map(_ => EMPTY) as MapToEmpty
-
-const mapEmptyRow = _ => mapToEmpty(range(0, boardSideLength)).join('')
+// | Maps the empty row from FEN notation '8' to a string of eight blanks: '8' -> '        '
+const mapEmptyRow = compose(joinChars, (x: EmptyRow) => map(_ => empty)(range(0, Number.parseInt(x))))
 
 const isEmptyRow = (x: string | EmptyRow) => x === boardSideLength.toString()
 
@@ -165,8 +164,8 @@ const emptyRowMapper =
 const splitBoard = splitForwardSlash
 
 const insertEmptyRows = map(emptyRowMapper)
-const parseBoard = compose(flatten, compose(insertEmptyRows, splitBoard))
-const board = parseBoard(initialBoard) as Board
+const parseBoard = compose(insertEmptyRows, splitBoard)
+const board = parseBoard(initialBoard)
 
 // | The FEN consists of 6 sections seperated by blanks
 // * {Piece placement} {Active colour} {Castling availability} {En passant target square} {Halfmove clock} {Fullmove number}
@@ -199,24 +198,3 @@ const board = parseBoard(initialBoard) as Board
 //
 // | Fullmove number
 // * The number of the full move. It starts at 1, and is incremented after Black's move.
-
-
-// | Read a square using FEN notation or ' ' for an empty square
-type ReadSquare = (x: string) => Square
-const readSquare: ReadSquare = x => PIECE_SYMBOLS[x] || EMPTY
-
-// | Shows a piece using FEN notation
-type ShowPiece = (p: Piece) => string
-const showPiece: ShowPiece = p => PIECE_SYMBOLS[p]
-
-// | Show a square using FEN notation or ' ' for an empty square
-type ShowSquare = (s: Square) => string
-const showSquare = showPiece
-
-const showRow = compose(joinChars, compose(map(showSquare), splitChars))
-
-type ShowBoard = (b: Board) => string
-const showBoard = map(showRow)
-
-const x = showBoard(board)
-x
