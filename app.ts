@@ -13,7 +13,7 @@ const complement: Complement = f => x => !f(x)
 const len = <T>(x: ReadonlyArray<T>) => x.length
 const concat = <T>(x: ReadonlyArray<T>) => (y: ReadonlyArray<T> | T) => x.concat(y)
 const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
-const split = (seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
+const split = (seperator: string | RegExp) => (s: string) => s.split(seperator)
 const join = (seperator: string) => <T>(xs: ReadonlyArray<T>) => xs.join(seperator)
 const slice = (start: number) => (end: number) => <T>(x: ReadonlyArray<T>) => x.slice(start, end)
 const tail = <T>(xs: ReadonlyArray<T>) => slice(0)(len(xs) - 1 - 1)(xs)
