@@ -124,5 +124,3 @@ const splitBoard = splitForwardSlash
 const insertEmptyRows = map(emptyRowMapper)
 const parseBoard = compose(insertEmptyRows, splitBoard)
 const board = parseBoard(initialBoard)
-
-board
