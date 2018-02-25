@@ -98,10 +98,10 @@ const jumpEastSouth = jumpEast (moveSouth)
 // | The initial board in FEN notation, 8 stands for an empty row
 const initialBoard = `rnbqkbnr/`
                    + `pppppppp/`
-                   + `8`
-                   + `8`
-                   + `8`
-                   + `8`
+                   + `8/`
+                   + `8/`
+                   + `8/`
+                   + `8/`
                    + `PPPPPPPP/`
                    + `RNBQKBNR`
 
@@ -110,7 +110,7 @@ const splitChars= split('')
 const joinChars = join('')
 
 // | Maps the empty row from FEN notation '8' to a string of eight blanks: '8' -> '        '
-const mapEmptyRow = compose(joinChars, (x: EmptyRow) => map(_ => empty)(range(0, Number.parseInt(x))))
+const mapEmptyRow = compose(joinChars, (_: EmptyRow) => map(_ => empty)(range(0, boardSideLength)))
 
 const isEmptyRow = (x: string | EmptyRow) => x === boardSideLength.toString()
 
@@ -124,3 +124,5 @@ const splitBoard = splitForwardSlash
 const insertEmptyRows = map(emptyRowMapper)
 const parseBoard = compose(insertEmptyRows, splitBoard)
 const board = parseBoard(initialBoard)
+
+board
