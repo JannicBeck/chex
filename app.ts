@@ -1,9 +1,55 @@
-type Move = (p: Pos) => number
-type BoardSideLength = 8
+// --- utils ---
+// | Logic
+type Identity = <T>(x: T) => T
+const identity: Identity = x => x
+type IfElse = <T>(c: (x: T) => boolean) => <R1>(f: (x: T) => R1) => <R2>(g: (x: T) => R2) => (x: T) => R1 | R2
+const ifElse: IfElse = c => f => g => x => c(x) ? f(x): g(x)
+type Compose = <R2, R3>(f: (x: R2) => R3) => <R1>(g: (x: R1) => R2) => (x: R1) => R3
+const compose: Compose = f => g => x => f(g(x))
+type Complement = <T>(f: (x: T) => boolean) => (x: T) => boolean
+const complement: Complement = f => x => !f(x)
+
+// | Arrays
+const len = <T>(x: ReadonlyArray<T>) => x.length
+const concat = <T>(x: ReadonlyArray<T>) => (y: ReadonlyArray<T> | T) => x.concat(y)
+const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
+const split = (seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
+const join = (seperator: string) => <T>(xs: ReadonlyArray<T>) => xs.join(seperator)
+const slice = (start: number) => (end: number) => <T>(x: ReadonlyArray<T>) => x.slice(start, end)
+const tail = <T>(xs: ReadonlyArray<T>) => slice(0)(len(xs) - 1 - 1)(xs)
+const head = <T>(xs: ReadonlyArray<T>) => xs[0]
+const last = <T>(xs: ReadonlyArray<T>) => xs[len(xs) - 1]
+const init = <T>(xs: ReadonlyArray<T>) => slice(1)(len(xs) - 1)(xs)
+const range = (start: number) => (end: number) => (xs: ReadonlyArray<number>): ReadonlyArray<number> =>
+  start === end
+  ? xs
+  : range(++start)(end)(concat(xs)(start))
+const isNumber = complement(Number.isNaN)
+const splitForwardSlash = split('/')
+const splitChars= split('')
+const joinChars = join('')
+
+// --- utils ---
+
+
+
+// --- Board representation ---
+type BoardSize = 8
+const boardSize: BoardSize = 8
+
+type BoardWidth = 10
+const boardWidth: BoardWidth = 10
+type BoardHeight = 12
+const boardHeight: BoardHeight = 12
+
+// const boardSize = boardHeight * boardWidth
+
 // | This type is used in the FEN notation to represent a blank row
 type EmptyRow = '8'
-type NegativeBoardSideLength = -8
-type Steps = 1 | -1 | BoardSideLength | NegativeBoardSideLength
+const emptyRow: EmptyRow = '8'
+
+type NegativeBoardSize = -8
+const negativeBoardSize: NegativeBoardSize = -8
 
 // | White pices are "PNBRQK"
 // * Black pieces are "pnbrqk"
@@ -12,36 +58,15 @@ enum Piece {
   P = 'P', N = 'N', B = 'B', R = 'R', Q = 'Q', K = 'K'
 }
 
-type Empty = ' '
-const empty = ' '
+type Empty = '0'
+const empty: Empty = '0'
+
+type OffBoard = 'X'
+const offBoard: OffBoard = 'X'
 
 type Square = Empty | Piece
 
-enum PlayerColor {
-  White,
-  Black
-}
-
 type Board = ReadonlyArray<Square>
-
-const identity = <T>(x: T) => x
-const ifElse = <T>(c: (x: T) => boolean) => <R1>(f: (x: T) => R1) => <R2>(g: (x: T) => R2) => (x: T) => c(x) ? f(x): g(x)
-const compose = <R1, R2, R3>(f: (x: R2) => R3, g: (x: R1) => R2) => (x: R1) => f(g(x))
-const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapper)
-const split = (seperator: string | RegExp, limit?: number) => (s: string) => s.split(seperator, limit)
-const join = (seperator: string) => <T>(xs: ReadonlyArray<T>) => xs.join(seperator)
-const flatten = <T>(xs: ReadonlyArray<T>) => [].concat(...xs) as ReadonlyArray<T>
-const complement = <T>(f: (x: T) => boolean) => (x: T) => !f(x)
-const tail = <T>(xs: ReadonlyArray<T>) => xs.slice(0, xs.length - 1 - 1)
-const head = <T>(xs: ReadonlyArray<T>) => xs[0]
-const last = <T>(xs: ReadonlyArray<T>) => xs[xs.length - 1]
-const init = <T>(xs: ReadonlyArray<T>) => xs.slice(1, xs.length - 1)
-const range = (start: number, end: number, xs: ReadonlyArray<number> = []): ReadonlyArray<number> =>
-  start === end
-  ? xs
-  : range(++start, end, xs.concat(start))
-
-const isNumber = complement(Number.isNaN)
 
 // | A1 is at 21 since there are two rows above the board
 // * and one row on each side of the board, so we know when the knight
@@ -63,24 +88,77 @@ const PIECE_SYMBOLS = {
   '♙': 'p', '♘': 'n', '♗': 'b', '♖': 'r', '♕': 'q', '♔': 'k',
   '♟': 'P', '♞': 'N', '♝': 'B', '♜': 'R', '♛': 'Q', '♚': 'K'
 }
+// --- Board representation ---
 
-// TODO add 2 files for the knight problem
-const boardSideLength: BoardSideLength = 8
-const negativeBoardSideLength: NegativeBoardSideLength = -8
-const emptyRow = boardSideLength.toString()
 
+
+// --- Parsing the board ---
+// | The initial board in FEN notation, 8 stands for an empty row
+const initialBoard = `rnbqkbnr/`
+                   + `pppppppp/`
+                   + `8/`
+                   + `8/`
+                   + `8/`
+                   + `8/`
+                   + `PPPPPPPP/`
+                   + `RNBQKBNR`
+
+const generateEmptyRow = range(0)(boardSize)([])
+
+// | Maps the empty row from FEN notation '8' to a string of eight blanks: '8' -> '        '
+const mapEmptyRow = compose
+  (joinChars)
+  ((_: EmptyRow) => map(_ => empty)(generateEmptyRow))
+
+const isEmptyRow = (x: string | EmptyRow) => x === boardSize.toString()
+
+const emptyRowMapper =
+  ifElse(isEmptyRow)
+    (mapEmptyRow)
+    (identity)
+
+const splitBoard = splitForwardSlash
+
+const insertEmptyRows = map(emptyRowMapper)
+const parseBoard = compose
+  (insertEmptyRows)
+  (splitBoard)
+const board = parseBoard(initialBoard)
+
+
+
+// const prependRows = concat(generateEmptyRow
+// const appendRows = 
+
+// --- Parsing the board ---
+
+
+
+// --- Moving along the board ---
+type Steps = 1 | -1 | BoardSize | NegativeBoardSize
+type Move = (p: Pos) => number
 const move = (s: Steps) => (p: Pos) => s + p
 
-const moveNorth = move(boardSideLength)
-const moveSouth = move(negativeBoardSideLength)
+const moveNorth = move(boardSize)
+const moveSouth = move(negativeBoardSize)
 const moveWest = move(-1)
 const moveEast = move(1)
-const moveNorthWest = compose(moveNorth, moveWest)
-const moveNorthEast = compose(moveNorth, moveEast)
-const moveSouthWest = compose(moveSouth, moveWest)
-const moveSouthEast = compose(moveSouth, moveEast)
+const moveNorthWest = compose
+  (moveNorth)
+  (moveWest)
+const moveNorthEast = compose
+  (moveNorth)
+  (moveEast)
+const moveSouthWest = compose
+  (moveSouth)
+  (moveWest)
+const moveSouthEast = compose
+  (moveSouth)
+  (moveEast)
 
-const jump = (f: Move) => (g: Move) => compose(g, compose(f, f))
+const jump = (f: Move) => (g: Move) => compose
+  (g)
+  (compose(f)(f))
 const jumpNorth = jump(moveNorth)
 const jumpSouth = jump(moveSouth)
 const jumpWest  = jump(moveWest)
@@ -94,33 +172,6 @@ const jumpWestNorth = jumpWest (moveNorth)
 const jumpWestSouth = jumpWest (moveSouth)
 const jumpEastNorth = jumpEast (moveNorth)
 const jumpEastSouth = jumpEast (moveSouth)
+// --- Moving along the board ---
 
-// | The initial board in FEN notation, 8 stands for an empty row
-const initialBoard = `rnbqkbnr/`
-                   + `pppppppp/`
-                   + `8/`
-                   + `8/`
-                   + `8/`
-                   + `8/`
-                   + `PPPPPPPP/`
-                   + `RNBQKBNR`
-
-const splitForwardSlash = split('/')
-const splitChars= split('')
-const joinChars = join('')
-
-// | Maps the empty row from FEN notation '8' to a string of eight blanks: '8' -> '        '
-const mapEmptyRow = compose(joinChars, (_: EmptyRow) => map(_ => empty)(range(0, boardSideLength)))
-
-const isEmptyRow = (x: string | EmptyRow) => x === boardSideLength.toString()
-
-const emptyRowMapper =
-  ifElse(isEmptyRow)
-    (mapEmptyRow)
-    (identity)
-
-const splitBoard = splitForwardSlash
-
-const insertEmptyRows = map(emptyRowMapper)
-const parseBoard = compose(insertEmptyRows, splitBoard)
-const board = parseBoard(initialBoard)
+board
