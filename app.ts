@@ -39,8 +39,8 @@ type BoardSize = 8
 const boardSize: BoardSize = 8
 
 // | This type is used in the FEN notation to represent a blank row
-type EmptyRow = '8'
-const emptyRow: EmptyRow = '8'
+type FenEmptyRow = "8"
+const fenEmptyRow: FenEmptyRow = "8"
 
 type NegativeBoardSize = -8
 const negativeBoardSize: NegativeBoardSize = -8
@@ -54,6 +54,9 @@ enum Piece {
 
 type Empty = '0'
 const empty: Empty = '0'
+
+type EmptyRow = "00000000"
+const emptyRow: EmptyRow = "00000000"
 
 type OffBoard = 'X'
 const offBoard: OffBoard = 'X'
@@ -99,22 +102,28 @@ const initialBoard = `rnbqkbnr/`
 
 const generateEmptyRow = range(0)(boardSize)([])
 
-// | Maps the empty row from FEN notation '8' to a string of eight blanks: '8' -> '        '
-const mapEmptyRow = compose
-  (joinChars)
-  ((_: EmptyRow) => map(_ => empty)(generateEmptyRow))
+const toEmptyRow = (_: FenEmptyRow) => map(_ => empty)(generateEmptyRow)
 
-type IsEmptyRow = (x: Piece | EmptyRow) => boolean
-const isEmptyRow: IsEmptyRow = x => x === emptyRow
+type JoinEmptys = (x: Empty[]) => "00000000"
+const joinEmptys: JoinEmptys = joinChars as JoinEmptys
+
+// | Maps the empty row from FEN notation '8' to chex notation
+type MapEmptyRow = (x: FenEmptyRow) => "00000000"
+const mapEmptyRow: MapEmptyRow = compose
+  (joinEmptys)
+  (toEmptyRow)
+
+type IsFenEmptyRow = (x: Piece | FenEmptyRow) => boolean
+const isFenEmptyRow: IsFenEmptyRow = x => x === fenEmptyRow
 
 
 const emptyRowMapper =
-  ifElse(isEmptyRow)
+  ifElse(isFenEmptyRow)
     (mapEmptyRow)
     (identity)
 
 
-type SplitBoard = (b: string) => (Piece | EmptyRow)[]
+type SplitBoard = (b: string) => (Piece | FenEmptyRow)[]
 const splitBoard: SplitBoard = splitForwardSlash as SplitBoard
 
 const insertEmptyRows = map(emptyRowMapper)
