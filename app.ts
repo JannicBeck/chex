@@ -1,3 +1,5 @@
+import 'jest'
+
 // --- utils ---
 // | Logic
 type Identity = <T>(x: T) => T
@@ -104,6 +106,7 @@ const mapEmptyRow = compose
 
 type IsEmptyRow = (x: Piece | EmptyRow) => boolean
 const isEmptyRow: IsEmptyRow = x => x === emptyRow
+
 
 const emptyRowMapper =
   ifElse(isEmptyRow)
