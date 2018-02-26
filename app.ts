@@ -28,7 +28,6 @@ const isNumber = complement(Number.isNaN)
 const splitForwardSlash = split('/')
 const splitChars= split('')
 const joinChars = join('')
-
 // --- utils ---
 
 
@@ -36,13 +35,6 @@ const joinChars = join('')
 // --- Board representation ---
 type BoardSize = 8
 const boardSize: BoardSize = 8
-
-type BoardWidth = 10
-const boardWidth: BoardWidth = 10
-type BoardHeight = 12
-const boardHeight: BoardHeight = 12
-
-// const boardSize = boardHeight * boardWidth
 
 // | This type is used in the FEN notation to represent a blank row
 type EmptyRow = '8'
@@ -110,26 +102,23 @@ const mapEmptyRow = compose
   (joinChars)
   ((_: EmptyRow) => map(_ => empty)(generateEmptyRow))
 
-const isEmptyRow = (x: string | EmptyRow) => x === boardSize.toString()
+type IsEmptyRow = (x: Piece | EmptyRow) => boolean
+const isEmptyRow: IsEmptyRow = x => x === emptyRow
 
 const emptyRowMapper =
   ifElse(isEmptyRow)
     (mapEmptyRow)
     (identity)
 
-const splitBoard = splitForwardSlash
+
+type SplitBoard = (b: string) => (Piece | EmptyRow)[]
+const splitBoard: SplitBoard = splitForwardSlash as SplitBoard
 
 const insertEmptyRows = map(emptyRowMapper)
 const parseBoard = compose
   (insertEmptyRows)
   (splitBoard)
 const board = parseBoard(initialBoard)
-
-
-
-// const prependRows = concat(generateEmptyRow
-// const appendRows = 
-
 // --- Parsing the board ---
 
 
@@ -173,5 +162,3 @@ const jumpWestSouth = jumpWest (moveSouth)
 const jumpEastNorth = jumpEast (moveNorth)
 const jumpEastSouth = jumpEast (moveSouth)
 // --- Moving along the board ---
-
-board
