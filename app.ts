@@ -100,15 +100,20 @@ const initialBoard = `rnbqkbnr/`
                    + `PPPPPPPP/`
                    + `RNBQKBNR`
 
-const generateEmptyRow = range(0)(boardSize)([])
+const generateRow = range(0)(boardSize)([])
 
-const toEmptyRow = (_: FenEmptyRow) => map(_ => empty)(generateEmptyRow)
+type ToEmptyRow = (x: FenEmptyRow) => Empty[]
+const toEmptyRow: ToEmptyRow = _ => map(_ => empty)(generateRow)
 
-type JoinEmptys = (x: Empty[]) => "00000000"
+expect(toEmptyRow(fenEmptyRow)).toHaveLength(boardSize)
+toEmptyRow(fenEmptyRow).map(x => expect(x).toBe(empty))
+
+
+type JoinEmptys = (x: Empty[]) => EmptyRow
 const joinEmptys: JoinEmptys = joinChars as JoinEmptys
 
 // | Maps the empty row from FEN notation '8' to chex notation
-type MapEmptyRow = (x: FenEmptyRow) => "00000000"
+type MapEmptyRow = (x: FenEmptyRow) => EmptyRow
 const mapEmptyRow: MapEmptyRow = compose
   (joinEmptys)
   (toEmptyRow)
@@ -116,6 +121,9 @@ const mapEmptyRow: MapEmptyRow = compose
 type IsFenEmptyRow = (x: Piece | FenEmptyRow) => boolean
 const isFenEmptyRow: IsFenEmptyRow = x => x === fenEmptyRow
 
+expect(isFenEmptyRow(fenEmptyRow)).toBe(true)
+expect(isFenEmptyRow(Piece.k)).toBe(false)
+expect(isFenEmptyRow(Piece.p)).toBe(false)
 
 const emptyRowMapper =
   ifElse(isFenEmptyRow)
