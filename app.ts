@@ -125,10 +125,11 @@ expect(isFenEmptyRow(fenEmptyRow)).toBe(true)
 expect(isFenEmptyRow(Piece.k)).toBe(false)
 expect(isFenEmptyRow(Piece.p)).toBe(false)
 
-const emptyRowMapper =
+type EmptyRowMapper = (x: Piece | FenEmptyRow) => Piece | EmptyRow
+const emptyRowMapper: EmptyRowMapper =
   ifElse(isFenEmptyRow)
     (mapEmptyRow)
-    (identity)
+    (identity as (x: Piece) => Piece)
 
 
 type SplitBoard = (b: string) => (Piece | FenEmptyRow)[]
