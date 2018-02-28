@@ -18,6 +18,7 @@ const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapp
 const split = (seperator: string | RegExp) => (s: string) => s.split(seperator)
 const join = (seperator: string) => <T>(xs: ReadonlyArray<T>) => xs.join(seperator)
 const slice = (start: number) => (end: number) => <T>(x: ReadonlyArray<T>) => x.slice(start, end)
+const flatten = <T> (xs: ReadonlyArray<T>) => [].concat(...xs) as ReadonlyArray<T>
 const tail = <T>(xs: ReadonlyArray<T>) => slice(0)(len(xs) - 1 - 1)(xs)
 const head = <T>(xs: ReadonlyArray<T>) => xs[0]
 const last = <T>(xs: ReadonlyArray<T>) => xs[len(xs) - 1]
@@ -114,9 +115,10 @@ const joinEmptys: JoinEmptys = joinChars as JoinEmptys
 
 // | Maps the empty row from FEN notation '8' to chex notation
 type MapEmptyRow = (x: FenEmptyRow) => EmptyRow
-const mapEmptyRow: MapEmptyRow = compose
-  (joinEmptys)
-  (toEmptyRow)
+const mapEmptyRow: MapEmptyRow =
+  compose
+    (joinEmptys)
+    (toEmptyRow)
 
 type IsFenEmptyRow = (x: Piece | FenEmptyRow) => boolean
 const isFenEmptyRow: IsFenEmptyRow = x => x === fenEmptyRow
@@ -131,17 +133,34 @@ const emptyRowMapper: EmptyRowMapper =
     (mapEmptyRow)
     (identity as (x: Piece) => Piece)
 
-
-type SplitBoard = (b: string) => (Piece | FenEmptyRow)[]
-const splitBoard: SplitBoard = splitForwardSlash as SplitBoard
-
 const insertEmptyRows = map(emptyRowMapper)
-const parseBoard = compose
-  (insertEmptyRows)
-  (splitBoard)
+    
+
+type SplitBoard = (b: string) => ReadonlyArray<Piece | FenEmptyRow>
+type MapBoard = (b: string) => ReadonlyArray<Piece | EmptyRow>
+
+const mapBoard: MapBoard =
+  compose
+    (insertEmptyRows)
+    (splitForwardSlash as SplitBoard)
+
+const splitSquares = splitChars as (x: string) => ReadonlyArray<Square>
+
+type JoinBoard = (b: ReadonlyArray<Piece | EmptyRow>) => ReadonlyArray<Square>
+const joinBoard: JoinBoard = 
+  compose
+    (flatten)
+    (map(splitSquares))
+
+
+type ParseBoard = (b: string) => ReadonlyArray<Square>
+const parseBoard: ParseBoard =
+  compose
+    (joinBoard)
+    (mapBoard)
+
 const board = parseBoard(initialBoard)
 // --- Parsing the board ---
-
 
 
 // --- Moving along the board ---
