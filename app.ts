@@ -18,7 +18,7 @@ const map = <T, R>(mapper: (x: T) => R) => (xs: ReadonlyArray<T>) => xs.map(mapp
 const split = (seperator: string | RegExp) => (s: string) => s.split(seperator)
 const join = (seperator: string) => <T>(xs: ReadonlyArray<T>) => xs.join(seperator)
 const slice = (start: number) => (end: number) => <T>(x: ReadonlyArray<T>) => x.slice(start, end)
-const flatten = <T> (xs: ReadonlyArray<T>) => [].concat(...xs) as ReadonlyArray<T>
+const flatten = <T>(xs: ReadonlyArray<ReadonlyArray<T>>) => [].concat(...xs) as ReadonlyArray<T>
 const tail = <T>(xs: ReadonlyArray<T>) => slice(0)(len(xs) - 1 - 1)(xs)
 const head = <T>(xs: ReadonlyArray<T>) => xs[0]
 const last = <T>(xs: ReadonlyArray<T>) => xs[len(xs) - 1]
@@ -135,23 +135,18 @@ const emptyRowMapper: EmptyRowMapper =
 
 const insertEmptyRows = map(emptyRowMapper)
     
-
 type SplitBoard = (b: string) => ReadonlyArray<Piece | FenEmptyRow>
 type MapBoard = (b: string) => ReadonlyArray<Piece | EmptyRow>
-
 const mapBoard: MapBoard =
   compose
     (insertEmptyRows)
     (splitForwardSlash as SplitBoard)
 
-const splitSquares = splitChars as (x: string) => ReadonlyArray<Square>
+const splitBoard = map(splitChars) as (b: ReadonlyArray<Piece | EmptyRow>) => ReadonlyArray<ReadonlyArray<Square>>
+const flattenBoard = flatten as (x: ReadonlyArray<ReadonlyArray<Square>>) => ReadonlyArray<Square>
 
 type JoinBoard = (b: ReadonlyArray<Piece | EmptyRow>) => ReadonlyArray<Square>
-const joinBoard: JoinBoard = 
-  compose
-    (flatten)
-    (map(splitSquares))
-
+const joinBoard = compose(flattenBoard)(splitBoard)
 
 type ParseBoard = (b: string) => ReadonlyArray<Square>
 const parseBoard: ParseBoard =
@@ -161,7 +156,6 @@ const parseBoard: ParseBoard =
 
 const board = parseBoard(initialBoard)
 // --- Parsing the board ---
-
 
 // --- Moving along the board ---
 type Steps = 1 | -1 | BoardSize | NegativeBoardSize
