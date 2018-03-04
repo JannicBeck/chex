@@ -1,5 +1,3 @@
-import 'jest'
-
 // --- utils ---
 // | Logic
 type Identity = <T>(x: T) => T
@@ -106,8 +104,8 @@ const generateRow = range(0)(boardSize)([])
 type ToEmptyRow = (x: FenEmptyRow) => Empty[]
 const toEmptyRow: ToEmptyRow = _ => map(_ => empty)(generateRow)
 
-expect(toEmptyRow(fenEmptyRow)).toHaveLength(boardSize)
-toEmptyRow(fenEmptyRow).map(x => expect(x).toBe(empty))
+// expect(toEmptyRow(fenEmptyRow)).toHaveLength(boardSize)
+// toEmptyRow(fenEmptyRow).map(x => expect(x).toBe(empty))
 
 
 type JoinEmptys = (x: Empty[]) => EmptyRow
@@ -120,14 +118,14 @@ const mapEmptyRow: MapEmptyRow =
     (joinEmptys)
     (toEmptyRow)
 
-expect(mapEmptyRow(fenEmptyRow)).toEqual(emptyRow)
+// expect(mapEmptyRow(fenEmptyRow)).toEqual(emptyRow)
 
 type IsFenEmptyRow = (x: Piece | FenEmptyRow) => boolean
 const isFenEmptyRow: IsFenEmptyRow = x => x === fenEmptyRow
 
-expect(isFenEmptyRow(fenEmptyRow)).toBe(true)
-expect(isFenEmptyRow(Piece.k)).toBe(false)
-expect(isFenEmptyRow(Piece.p)).toBe(false)
+// expect(isFenEmptyRow(fenEmptyRow)).toBe(true)
+// expect(isFenEmptyRow(Piece.k)).toBe(false)
+// expect(isFenEmptyRow(Piece.p)).toBe(false)
 
 type EmptyRowMapper = (x: Piece | FenEmptyRow) => Piece | EmptyRow
 const emptyRowMapper: EmptyRowMapper =
@@ -136,9 +134,9 @@ const emptyRowMapper: EmptyRowMapper =
   (mapEmptyRow)
   (identity as (x: Piece) => Piece)
 
-expect(emptyRowMapper(fenEmptyRow)).toEqual(emptyRow)
-expect(emptyRowMapper(Piece.k)).toEqual(Piece.k)
-expect(emptyRowMapper(Piece.p)).toEqual(Piece.p)
+// expect(emptyRowMapper(fenEmptyRow)).toEqual(emptyRow)
+// expect(emptyRowMapper(Piece.k)).toEqual(Piece.k)
+// expect(emptyRowMapper(Piece.p)).toEqual(Piece.p)
 
 
 const insertEmptyRows = map(emptyRowMapper)
@@ -150,7 +148,7 @@ const mapBoard: MapBoard =
     (insertEmptyRows)
     (splitForwardSlash as SplitBoard)
 
-expect(mapBoard(initialBoard)).toEqual([
+const actualMappedBoard = [
   'rnbqkbnr',
   'pppppppp',
   '00000000',
@@ -159,7 +157,8 @@ expect(mapBoard(initialBoard)).toEqual([
   '00000000',
   'PPPPPPPP',
   'RNBQKBNR' 
-])
+]
+// expect(mapBoard(initialBoard)).toEqual(actual)
 
 const splitBoard = map(splitChars) as (b: ReadonlyArray<Piece | EmptyRow>) => ReadonlyArray<ReadonlyArray<Square>>
 const flattenBoard = flatten as (x: ReadonlyArray<ReadonlyArray<Square>>) => ReadonlyArray<Square>
@@ -173,15 +172,16 @@ const parseBoard: ParseBoard =
     (joinBoard)
     (mapBoard)
 
-const expected = `rnbqkbnr/`
-               + `pppppppp/`
-               + `8/`
-               + `8/`
-               + `8/`
-               + `8/`
-               + `PPPPPPPP/`
-               + `RNBQKBNR`
+const expected = [ 'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r',
+                   'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p',
+                   '0', '0', '0', '0', '0', '0', '0', '0',
+                   '0', '0', '0', '0', '0', '0', '0', '0',
+                   '0', '0', '0', '0', '0', '0', '0', '0',
+                   '0', '0', '0', '0', '0', '0', '0', '0',
+                   'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P',
+                   'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R' ];
 
+// expect(joinBoard(actualMappedBoard)).toEqual(expected)
 
 const board = parseBoard(initialBoard)
 // --- Parsing the board ---
