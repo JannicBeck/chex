@@ -25,7 +25,6 @@ const range = (start: number) => (end: number) => (xs: ReadonlyArray<number>): R
   start === end
   ? xs
   : range(++start)(end)(concat(xs)(start))
-const isNumber = complement(Number.isNaN)
 const splitForwardSlash = split('/')
 const splitChars= split('')
 const joinChars = join('')
@@ -40,6 +39,8 @@ const boardSize: BoardSize = 8
 // | This type is used in the FEN notation to represent a blank row
 type FenEmptyRow = "8"
 const fenEmptyRow: FenEmptyRow = "8"
+
+type FenNumber = "1" | "2" | "3" | "4" | "5" | "6" | "7" | FenEmptyRow
 
 type NegativeBoardSize = -8
 const negativeBoardSize: NegativeBoardSize = -8
@@ -90,7 +91,7 @@ const PIECE_SYMBOLS = {
 
 // --- Parsing the board ---
 // | The initial board in FEN notation, 8 stands for an empty row
-const initialBoard = `rnbqkbnr/`
+const initialBoard = `r7/`
                    + `pppppppp/`
                    + `8/`
                    + `8/`
@@ -99,10 +100,10 @@ const initialBoard = `rnbqkbnr/`
                    + `PPPPPPPP/`
                    + `RNBQKBNR`
 
-const generateRow = range(0)(boardSize)([])
+const generateRow = (x: FenNumber) => range(0)(0)([])
 
-type ToEmptyRow = (x: FenEmptyRow) => Empty[]
-const toEmptyRow: ToEmptyRow = _ => map(_ => empty)(generateRow)
+type ToEmptyRow = (x: FenNumber) => Empty[]
+const toEmptyRow: ToEmptyRow = x => map(_ => empty)(generateRow(x))
 
 // expect(toEmptyRow(fenEmptyRow)).toHaveLength(boardSize)
 // toEmptyRow(fenEmptyRow).map(x => expect(x).toBe(empty))
@@ -112,7 +113,7 @@ type JoinEmptys = (x: Empty[]) => EmptyRow
 const joinEmptys: JoinEmptys = joinChars as JoinEmptys
 
 // | Maps the empty row from FEN notation '8' to chex notation
-type MapEmptyRow = (x: FenEmptyRow) => EmptyRow
+type MapEmptyRow = (x: FenNumber) => EmptyRow
 const mapEmptyRow: MapEmptyRow =
   compose
     (joinEmptys)
@@ -120,17 +121,17 @@ const mapEmptyRow: MapEmptyRow =
 
 // expect(mapEmptyRow(fenEmptyRow)).toEqual(emptyRow)
 
-type IsFenEmptyRow = (x: Piece | FenEmptyRow) => boolean
-const isFenEmptyRow: IsFenEmptyRow = x => x === fenEmptyRow
+type IsFenNumber = (x: Piece | FenNumber) => boolean
+const isFenNumber: IsFenNumber = x => typeof Piece[x] === 'undefined'
 
 // expect(isFenEmptyRow(fenEmptyRow)).toBe(true)
 // expect(isFenEmptyRow(Piece.k)).toBe(false)
 // expect(isFenEmptyRow(Piece.p)).toBe(false)
 
-type EmptyRowMapper = (x: Piece | FenEmptyRow) => Piece | EmptyRow
+type EmptyRowMapper = (x: Piece | FenNumber) => Piece | EmptyRow
 const emptyRowMapper: EmptyRowMapper =
   ifElse
-  (isFenEmptyRow)
+  (isFenNumber)
   (mapEmptyRow)
   (identity as (x: Piece) => Piece)
 
@@ -184,6 +185,8 @@ const expected = [ 'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r',
 // expect(joinBoard(actualMappedBoard)).toEqual(expected)
 
 const board = parseBoard(initialBoard)
+board
+console.log(board)
 // --- Parsing the board ---
 
 // --- Moving along the board ---
