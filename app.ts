@@ -100,7 +100,7 @@ const initialBoard = `r7/`
                    + `PPPPPPPP/`
                    + `RNBQKBNR`
 
-const generateRow = (x: FenNumber) => range(0)(0)([])
+const generateRow = (x: FenNumber) => range(0)(3)([])
 
 type ToEmptyRow = (x: FenNumber) => Empty[]
 const toEmptyRow: ToEmptyRow = x => map(_ => empty)(generateRow(x))
@@ -122,11 +122,11 @@ const mapEmptyRow: MapEmptyRow =
 // expect(mapEmptyRow(fenEmptyRow)).toEqual(emptyRow)
 
 type IsFenNumber = (x: Piece | FenNumber) => boolean
-const isFenNumber: IsFenNumber = x => typeof Piece[x] === 'undefined'
+const isFenNumber: IsFenNumber = x => 0 < +x && +x <= 8 
 
-// expect(isFenEmptyRow(fenEmptyRow)).toBe(true)
-// expect(isFenEmptyRow(Piece.k)).toBe(false)
-// expect(isFenEmptyRow(Piece.p)).toBe(false)
+// expect(isFenNumber(fenEmptyRow)).toBe(true)
+// expect(isFenNumber(Piece.k)).toBe(false)
+// expect(isFenNumber(Piece.p)).toBe(false)
 
 type EmptyRowMapper = (x: Piece | FenNumber) => Piece | EmptyRow
 const emptyRowMapper: EmptyRowMapper =
